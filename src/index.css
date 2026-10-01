@@ -1,0 +1,118 @@
+/* ==========================================================================
+   INSTALENS DESIGN SYSTEM
+   Modern Neo-SaaS Aesthetic: Clean Bento Grids, Mint, Obsidian & Warm Canvas
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* --- Canvas & Surface Colors --- */
+  --bento-bg: #F4F5F7;
+  --bento-card: #FFFFFF;
+  --bento-card-subtle: #F9FAFB;
+  --bento-sidebar: #FFFFFF;
+
+  /* --- Brand & Accents --- */
+  --bento-accent: #10B981;
+  --bento-accent-hover: #059669;
+  --bento-accent-soft: #ECFDF5;
+  --bento-accent-border: #A7F3D0;
+  --bento-accent-glow: rgba(16, 185, 129, 0.2);
+
+  --bento-lime: #84CC16;
+  --bento-lime-soft: #F7FEE7;
+  --bento-lime-border: #D9F99D;
+
+  /* --- Neutral Slate & Obsidian Typography --- */
+  --bento-text-main: #111827;
+  --bento-text-muted: #6B7280;
+  --bento-text-light: #9CA3AF;
+  --bento-text-white: #FFFFFF;
+
+  /* --- Semantic Status Badges --- */
+  --bento-rose: #EF4444;
+  --bento-rose-soft: #FEF2F2;
+  --bento-rose-border: #FECACA;
+
+  --bento-amber: #F59E0B;
+  --bento-amber-soft: #FFFBEB;
+  --bento-amber-border: #FDE68A;
+
+  --bento-blue: #3B82F6;
+  --bento-blue-soft: #EFF6FF;
+  --bento-blue-border: #BFDBFE;
+
+  /* --- Borders & Hairlines --- */
+  --bento-border: rgba(0, 0, 0, 0.07);
+  --bento-border-subtle: rgba(0, 0, 0, 0.04);
+  --bento-border-active: rgba(16, 185, 129, 0.4);
+
+  /* --- Bento Shadows & Depth --- */
+  --bento-shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.04);
+  --bento-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.02), 0 8px 24px -4px rgba(0, 0, 0, 0.04);
+  --bento-shadow-hover: 0 12px 32px -4px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.02);
+  --bento-shadow-modal: 0 24px 64px -8px rgba(0, 0, 0, 0.16);
+
+  /* --- Continuous Bento Radii --- */
+  --bento-radius-sm: 10px;
+  --bento-radius-md: 14px;
+  --bento-radius-lg: 18px;
+  --bento-radius-xl: 22px;
+  --bento-radius-2xl: 28px;
+  --bento-radius-pill: 9999px;
+
+  /* --- Typography --- */
+  --bento-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --bento-font-mono: 'JetBrains Mono', monospace;
+
+  /* --- Smooth Transitions --- */
+  --bento-transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==========================================================================
+   GLOBAL RESET & TYPOGRAPHY
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  min-height: 100%;
+  background-color: var(--bento-bg);
+  color: var(--bento-text-main);
+  font-family: var(--bento-font);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: var(--bento-radius-pill);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.22);
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
