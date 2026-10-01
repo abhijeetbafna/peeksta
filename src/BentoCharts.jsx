@@ -180,7 +180,7 @@ export function ActivityBarChart({ height = 48 }) {
           style={{
             flex: 1,
             height: `${bar.height}%`,
-            background: bar.active ? '#10B981' : 'rgba(16, 185, 129, 0.18)',
+            background: bar.active ? 'var(--bento-accent)' : 'var(--bento-accent-glow)',
             borderRadius: '4px',
             transition: 'all 0.2s ease'
           }}

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BENTO DASHBOARD — HIGH-DENSITY, SLEEK PROPORTIONS
+   Peeksta DASHBOARD â€” HIGH-DENSITY, SLEEK PROPORTIONS
    ========================================================================== */
 
 /* --- Outer Shell Container --- */
@@ -78,14 +78,14 @@
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  background: linear-gradient(135deg, #F77737 0%, #E1306C 40%, #833AB4 75%, #5851DB 100%);
   color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 14px;
   font-weight: 800;
-  box-shadow: 0 2px 8px var(--bento-accent-glow);
+  box-shadow: 0 2px 8px rgba(227, 64, 128, 0.35);
 }
 
 .brand-text-wrap {
@@ -380,13 +380,13 @@
 }
 
 .bento-btn-primary {
-  background: #10B981;
+  background: var(--bento-accent);
   color: #FFFFFF;
   box-shadow: 0 1px 4px var(--bento-accent-glow);
 }
 
 .bento-btn-primary:hover {
-  background: #059669;
+  background: var(--bento-accent-hover);
 }
 
 .bento-btn-dark {
@@ -485,9 +485,9 @@
   gap: 5px;
   padding: 2px 8px;
   border-radius: var(--bento-radius-pill);
-  background: rgba(16, 185, 129, 0.15);
-  color: #34D399;
-  border: 1px solid rgba(16, 185, 129, 0.28);
+  background: var(--bento-accent-soft);
+  color: var(--bento-accent);
+  border: 1px solid var(--bento-accent-border);
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
@@ -499,8 +499,8 @@
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: #10B981;
-  box-shadow: 0 0 6px #10B981;
+  background: var(--bento-accent);
+  box-shadow: 0 0 6px var(--bento-accent);
 }
 
 .hero-headline {
@@ -718,7 +718,7 @@
 
 .bento-filter-chip.active {
   background: var(--bento-accent-soft);
-  border-color: rgba(16, 185, 129, 0.35);
+  border-color: var(--bento-accent-border);
   color: var(--bento-accent);
   font-weight: 700;
 }
@@ -944,7 +944,7 @@
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  border: 3px solid #10B981;
+  border: 3px solid var(--bento-accent);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -956,14 +956,14 @@
 .score-grade-text {
   font-size: 18px;
   font-weight: 800;
-  color: #059669;
+  color: var(--bento-accent-hover);
   line-height: 1;
 }
 
 .score-num-text {
   font-size: 9px;
   font-weight: 700;
-  color: #059669;
+  color: var(--bento-accent-hover);
   margin-top: 1px;
 }
 
@@ -993,7 +993,7 @@
 }
 
 .bento-dropzone {
-  border: 2px dashed rgba(16, 185, 129, 0.35);
+  border: 2px dashed var(--bento-accent-border);
   border-radius: var(--bento-radius-lg);
   padding: 32px 20px;
   background: var(--bento-card-subtle);
@@ -1312,3 +1312,4 @@
   max-width: 380px;
   margin: 0 auto;
 }
+

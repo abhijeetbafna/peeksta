@@ -413,7 +413,7 @@ function UserAvatar({ username, name }) {
   );
 }
 
-function App() {
+function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
   const [dataSets, setDataSets] = useState({});
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview'); 
@@ -442,6 +442,8 @@ function App() {
   const [slotFollowing, setSlotFollowing] = useState(null);
   const [pasteContent, setPasteContent] = useState('');
   const [pasteType, setPasteType] = useState('followers');
+
+
 
   const loadDemoData = () => {
     const demoFollowing = [
@@ -487,6 +489,28 @@ function App() {
     setActiveTab('overview');
     showToast('Loaded demo dataset successfully!');
   };
+
+  // Auto-load demo when launched from landing page
+  useEffect(() => {
+    if (initialDemo) {
+      const t = setTimeout(() => loadDemoData(), 80);
+      return () => clearTimeout(t);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-process a file passed from the landing page upload picker
+  useEffect(() => {
+    if (!preloadedFile) return;
+    const f = preloadedFile;
+    const t = setTimeout(() => {
+      if (f.name.toLowerCase().endsWith('.zip')) {
+        handleZipUpload({ target: { files: [f] } });
+      } else {
+        handleMultiUpload({ target: { files: [f] } });
+      }
+    }, 80);
+    return () => clearTimeout(t);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -1069,13 +1093,14 @@ function App() {
         <div className="bento-brand">
           <div className="brand-identity" onClick={() => { setActiveTab('overview'); setSidebarOpen(false); }}>
             <div className="brand-logo-gem">
-              <IconZap size={16} />
+              {/* Peeksta logo: circle ring + center dot (Instagram-style) */}
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="8" cy="8" r="5.5" stroke="white" strokeWidth="1.6" fill="none"/>
+                <circle cx="8" cy="8" r="2.2" fill="white"/>
+              </svg>
             </div>
             <div className="brand-text-wrap">
-              <span className="brand-app-name">
-                InstaLens
-                <span className="brand-badge-pill">AI</span>
-              </span>
+              <span className="brand-app-name">Peeksta</span>
               <span className="brand-subtext">Network Intelligence</span>
             </div>
           </div>
@@ -1281,15 +1306,34 @@ function App() {
             <button className="mobile-menu-toggle" onClick={() => setSidebarOpen(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <IconDashboard size={15} />
             </button>
+            {onBackToLanding && (
+              <button
+                onClick={onBackToLanding}
+                title="Back to Home"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '5px',
+                  background: 'none', border: 'none',
+                  color: 'var(--bento-text-muted)', fontSize: '12px',
+                  fontWeight: 600, cursor: 'pointer', padding: '4px 8px',
+                  borderRadius: '8px', fontFamily: 'inherit',
+                  transition: 'color 0.15s, background 0.15s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color='var(--bento-text-main)'; e.currentTarget.style.background='var(--bento-card-subtle)'; }}
+                onMouseLeave={e => { e.currentTarget.style.color='var(--bento-text-muted)'; e.currentTarget.style.background='none'; }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Home
+              </button>
+            )}
             <div className="greeting-text">
               <h2>
                 {hasData
                   ? "Welcome Back, Explorer"
-                  : "Ready to conquer your network? Welcome to InstaLens"}
+                  : "Ready to conquer your network? Welcome to Peeksta"}
               </h2>
               <p>
                 {hasData
-                  ? `${insights.following.length} following • ${insights.followers.length} followers • ${insights.notFollowingMeBack.length} non-followers`
+                  ? `${insights.following.length} following Ã¢â‚¬Â¢ ${insights.followers.length} followers Ã¢â‚¬Â¢ ${insights.notFollowingMeBack.length} non-followers`
                   : "AI-powered Instagram audience analytics & unfollow tracking"}
               </p>
             </div>
@@ -1378,7 +1422,7 @@ function App() {
                   width: '6px',
                   height: '6px',
                   borderRadius: '50%',
-                  background: '#10B981'
+                  background: 'var(--bento-accent)'
                 }}
               />
             </div>
@@ -1475,7 +1519,7 @@ function App() {
                     <p className="hero-subheadline" style={{ fontSize: '11.5px', marginBottom: '14px' }}>
                       {hasData
                         ? `${insights.notFollowingMeBack.length} of your ${insights.following.length} following do not follow back. Review below.`
-                        : "Welcome to InstaLens! Load your archive or test with demo data."}
+                        : "Welcome to Peeksta! Load your archive or test with demo data."}
                     </p>
                     <div className="hero-actions-group">
                       {hasData ? (
@@ -1987,3 +2031,5 @@ function App() {
 
 
 export default App;
+
+
