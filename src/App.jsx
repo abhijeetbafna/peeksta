@@ -1104,7 +1104,7 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
               <span className="brand-subtext">Network Intelligence</span>
             </div>
           </div>
-          <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)} aria-label="Close sidebar">
             <IconClose size={13} />
           </button>
         </div>
@@ -1303,7 +1303,7 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
         {/* Top App Bar */}
         <header className="bento-topbar">
           <div className="topbar-greeting-wrap">
-            <button className="mobile-menu-toggle" onClick={() => setSidebarOpen(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <button className="mobile-menu-toggle" onClick={() => setSidebarOpen(true)} aria-label="Open sidebar">
               <IconDashboard size={15} />
             </button>
             {onBackToLanding && (
@@ -1333,7 +1333,7 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
               </h2>
               <p>
                 {hasData
-                  ? `${insights.following.length} following Ã¢â‚¬Â¢ ${insights.followers.length} followers Ã¢â‚¬Â¢ ${insights.notFollowingMeBack.length} non-followers`
+                  ? `${insights.following.length} following • ${insights.followers.length} followers • ${insights.notFollowingMeBack.length} non-followers`
                   : "AI-powered Instagram audience analytics & unfollow tracking"}
               </p>
             </div>

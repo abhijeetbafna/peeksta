@@ -120,16 +120,26 @@
 
 .sidebar-close-btn {
   display: none;
-  background: none;
-  border: none;
-  font-size: 16px;
+  background: var(--bento-card-subtle);
+  border: 1px solid var(--bento-border);
+  border-radius: var(--bento-radius-sm);
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
   color: var(--bento-text-muted);
   cursor: pointer;
+  transition: var(--bento-transition);
+}
+
+.sidebar-close-btn:hover {
+  color: var(--bento-text-main);
+  border-color: var(--bento-border-active);
 }
 
 @media (max-width: 1024px) {
   .sidebar-close-btn {
-    display: block;
+    display: flex;
   }
 }
 
@@ -295,14 +305,24 @@
   background: var(--bento-card-subtle);
   border: 1px solid var(--bento-border);
   border-radius: var(--bento-radius-sm);
-  padding: 4px 8px;
-  font-size: 14px;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  color: var(--bento-text-main);
   cursor: pointer;
+  flex-shrink: 0;
+  transition: var(--bento-transition);
+}
+
+.mobile-menu-toggle:hover {
+  border-color: var(--bento-accent-border);
+  color: var(--bento-accent);
 }
 
 @media (max-width: 1024px) {
   .mobile-menu-toggle {
-    display: block;
+    display: flex;
   }
 }
 

@@ -4,7 +4,7 @@
 export function SmoothWaveSparkline({ color = 'green', height = 36 }) {
   const isGreen = color === 'green';
   const isRed = color === 'red';
-  const strokeColor = isGreen ? '#10B981' : isRed ? '#F43F5E' : '#F59E0B';
+  const strokeColor = isGreen ? '#C13584' : isRed ? '#F43F5E' : '#F59E0B';
   const gradientId = `wave-grad-${color}`;
 
   // Smooth continuous multi-point cubic bezier wave spanning x: 0 to 200
@@ -74,14 +74,14 @@ export function DonutAllocationChart({
             stroke="rgba(0, 0, 0, 0.05)"
             strokeWidth="11"
           />
-          {/* Mutuals Segment (Green) */}
+          {/* Mutuals Segment (Accent) */}
           {strokeMutual > 0 && (
             <circle
               cx="50"
               cy="50"
               r={radius}
               fill="transparent"
-              stroke="#10B981"
+              stroke="#C13584"
               strokeWidth="11"
               strokeDasharray={`${strokeMutual} ${circumference}`}
               strokeDashoffset="0"
@@ -142,8 +142,8 @@ export function DonutAllocationChart({
 
       {/* Legend */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '11.5px', fontWeight: 600 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#10B981' }}>
-          <span style={{ width: '8px', height: '8px', borderRadius: '2px', background: '#10B981' }}></span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#C13584' }}>
+          <span style={{ width: '8px', height: '8px', borderRadius: '2px', background: '#C13584' }}></span>
           <span>{mutuals} Mutuals ({pctMutual}%)</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#F43F5E' }}>
