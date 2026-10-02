@@ -177,11 +177,11 @@ export default function LandingPage({ onEnter, onDemo }) {
               <span>100% Private & Local</span>
             </div>
             <h1 className="lp-hero-headline">
-              Instagram DMs &<br/>
-              <span className="lp-gradient-text">Conversations, Visualized.</span>
+              Your Instagram Data,<br/>
+              <span className="lp-gradient-text">Beautifully Visualized.</span>
             </h1>
             <p className="lp-hero-sub">
-              Explore your full DM history, voice notes, shared reels, and network connection dynamics — 100% privately inside your browser.
+              Explore your network dynamics, engagement trends, and personal insights — 100% privately inside your browser.
             </p>
             <div className="lp-hero-ctas">
               <button className="lp-btn-hero-primary" id="lp-hero-upload-btn" onClick={() => onEnter()}>
@@ -212,7 +212,7 @@ export default function LandingPage({ onEnter, onDemo }) {
               <div className="lp-preview-body">
                 <div className="lp-mock-sidebar">
                   <div className="lp-mock-brand-bar"/>
-                  {['Dashboard','Audience Reciprocity','Mutual Friends','DMs & Messages','Security'].map((l, i) => (
+                  {['Dashboard','Audience Reciprocity','Mutual Friends','Chat Insights','Security'].map((l, i) => (
                     <div key={i} className={`lp-mock-nav-item ${i === 0 ? 'active' : ''}`}>
                       <div className="lp-mock-nav-dot"/>{l}
                     </div>
@@ -250,7 +250,7 @@ export default function LandingPage({ onEnter, onDemo }) {
                   <div className="lp-mock-list">
                     {[
                       { u: 'creative_studio', tag: 'Network Gap', c: '#E1306C', bg: '#FDF0F8' },
-                      { u: 'alex_perez', tag: '1,420 msgs · DM Viewer', c: '#833AB4', bg: '#FDF0F8' },
+                      { u: 'alex_perez', tag: 'Top Connection', c: '#833AB4', bg: '#FDF0F8' },
                       { u: 'mutual_friend_01', tag: 'Mutual', c: '#C13584', bg: '#FDF0F8' },
                     ].map((row, i) => (
                       <div key={i} className="lp-mock-list-row">
@@ -272,7 +272,7 @@ export default function LandingPage({ onEnter, onDemo }) {
         <div className={`lp-stats-bar ${heroVis ? 'lp-visible' : ''}`} style={{ transitionDelay: '300ms' }}>
           {[
             { v: '100%', l: 'Browser Privacy' },
-            { v: 'DM Viewer', l: 'Chats, Audio & Reels' },
+            { v: 'Deep Insights', l: 'Interactive Data Analytics' },
             { v: 'Network Insights', l: 'Relationship Reciprocity' },
             { v: '0 Server Uploads', l: 'Runs Entirely Locally' },
           ].map((s, i) => (

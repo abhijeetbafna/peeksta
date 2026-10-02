@@ -30,7 +30,7 @@ function getCleanHandle(nameStr) {
 }
 
 // UserAvatar Component: Fetches real-time profile pictures from Instagram with initial fallback
-export function UserAvatar({ username, title, size = 38, style = {} }) {
+export function UserAvatar({ username, title, size = 38, style = {}, isDark = true }) {
   const [imgError, setImgError] = useState(false);
   const handle = getCleanHandle(username || title);
   
@@ -81,11 +81,11 @@ export function UserAvatar({ username, title, size = 38, style = {} }) {
             width: '100%',
             height: '100%',
             borderRadius: '50%',
-            background: '#1A1A1A',
+            background: isDark ? '#1A1A1A' : '#E5E7EB',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#FFF',
+            color: isDark ? '#FFF' : '#111827',
             fontWeight: 700,
             fontSize: `${Math.max(10, Math.floor(size * 0.35))}px`
           }}
@@ -98,12 +98,20 @@ export function UserAvatar({ username, title, size = 38, style = {} }) {
 }
 
 // ThreadAnalyticsView Component: Renders visual conversation metrics, timeline milestones, text length averages, reply speeds & top emojis
-export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMessage }) {
+export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMessage, colors, isDark = true }) {
+  const palette = colors || {
+    cardBg: isDark ? '#141414' : '#FFFFFF',
+    cardInnerBg: isDark ? '#1F1F1F' : '#F3F4F6',
+    textPrimary: isDark ? '#FFFFFF' : '#111827',
+    textSecondary: isDark ? '#8E8E8E' : '#6B7280',
+    border: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'
+  };
+
   if (!analytics) {
     return (
-      <div style={{ textAlign: 'center', padding: '60px 20px', color: '#8E8E8E' }}>
+      <div style={{ textAlign: 'center', padding: '60px 20px', color: palette.textSecondary }}>
         <IconZap size={36} style={{ color: '#E1306C', marginBottom: '12px' }} />
-        <h4 style={{ fontSize: '15px', color: '#FFF', marginBottom: '6px' }}>No Analytics Available</h4>
+        <h4 style={{ fontSize: '15px', color: palette.textPrimary, marginBottom: '6px' }}>No Analytics Available</h4>
         <p style={{ fontSize: '12.5px' }}>Not enough message history to calculate analytics for this conversation.</p>
       </div>
     );
@@ -170,17 +178,17 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.3)'
+          boxShadow: '0 8px 24px rgba(0,0,0,0.15)'
         }}
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
             <span style={{ fontSize: '18px' }}>📊</span>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#FFF', margin: 0 }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 700, color: palette.textPrimary, margin: 0 }}>
               Conversation Insights
             </h3>
           </div>
-          <p style={{ fontSize: '12.5px', color: '#A8A8A8', margin: 0 }}>
+          <p style={{ fontSize: '12.5px', color: palette.textSecondary, margin: 0 }}>
             Deep analytics for <strong>{thread.title}</strong> across {totalMsgs.toLocaleString()} messages
           </p>
         </div>
@@ -210,27 +218,27 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
 
           <div
             style={{
-              background: '#1A1A1A',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: palette.cardInnerBg,
+              border: `1px solid ${palette.border}`,
               borderRadius: '12px',
               padding: '10px 14px',
               textAlign: 'center'
             }}
           >
             <div style={{ fontSize: '18px', fontWeight: 800, color: '#E1306C' }}>{maxStreakDays} 🔥</div>
-            <div style={{ fontSize: '10px', color: '#8E8E8E', textTransform: 'uppercase', fontWeight: 700 }}>Day Streak</div>
+            <div style={{ fontSize: '10px', color: palette.textSecondary, textTransform: 'uppercase', fontWeight: 700 }}>Day Streak</div>
           </div>
           <div
             style={{
-              background: '#1A1A1A',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: palette.cardInnerBg,
+              border: `1px solid ${palette.border}`,
               borderRadius: '12px',
               padding: '10px 14px',
               textAlign: 'center'
             }}
           >
             <div style={{ fontSize: '18px', fontWeight: 800, color: '#833AB4' }}>{uniqueActiveDays} 📅</div>
-            <div style={{ fontSize: '10px', color: '#8E8E8E', textTransform: 'uppercase', fontWeight: 700 }}>Active Days</div>
+            <div style={{ fontSize: '10px', color: palette.textSecondary, textTransform: 'uppercase', fontWeight: 700 }}>Active Days</div>
           </div>
         </div>
       </div>
@@ -241,8 +249,8 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
         {/* Card: First Message Date */}
         <div
           style={{
-            background: '#141414',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: palette.cardBg,
+            border: `1px solid ${palette.border}`,
             borderRadius: '16px',
             padding: '18px 20px',
             display: 'flex',
@@ -254,10 +262,10 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
             <div style={{ fontSize: '11px', color: '#E1306C', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span>🚀</span> First Conversation Date
             </div>
-            <div style={{ fontSize: '17px', fontWeight: 800, color: '#FFF' }}>
+            <div style={{ fontSize: '17px', fontWeight: 800, color: palette.textPrimary }}>
               {firstMsgDate}
             </div>
-            <div style={{ fontSize: '11.5px', color: '#8E8E8E', marginTop: '2px' }}>
+            <div style={{ fontSize: '11.5px', color: palette.textSecondary, marginTop: '2px' }}>
               {firstMsgTime} {firstMsgSender ? `• by ${firstMsgSender}` : ''}
             </div>
           </div>
@@ -271,7 +279,7 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
                 borderRadius: '10px',
                 border: '1px solid rgba(225, 48, 108, 0.4)',
                 background: 'rgba(225, 48, 108, 0.12)',
-                color: '#FF6B98',
+                color: '#E1306C',
                 fontSize: '12px',
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -290,8 +298,8 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
         {/* Card: Peak Activity Record Day */}
         <div
           style={{
-            background: '#141414',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: palette.cardBg,
+            border: `1px solid ${palette.border}`,
             borderRadius: '16px',
             padding: '18px 20px',
             display: 'flex',
@@ -300,13 +308,13 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
           }}
         >
           <div>
-            <div style={{ fontSize: '11px', color: '#F9CE34', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ fontSize: '11px', color: '#F59E0B', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span>🔥</span> Record Peak Day
             </div>
-            <div style={{ fontSize: '17px', fontWeight: 800, color: '#FFF' }}>
+            <div style={{ fontSize: '17px', fontWeight: 800, color: palette.textPrimary }}>
               {peakDateStr}
             </div>
-            <div style={{ fontSize: '11.5px', color: '#F9CE34', marginTop: '2px', fontWeight: 600 }}>
+            <div style={{ fontSize: '11.5px', color: '#F59E0B', marginTop: '2px', fontWeight: 600 }}>
               {peakDateCount} messages sent in 24 hours
             </div>
           </div>
@@ -318,9 +326,9 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
                 marginTop: '14px',
                 padding: '8px 12px',
                 borderRadius: '10px',
-                border: '1px solid rgba(249, 206, 52, 0.4)',
-                background: 'rgba(249, 206, 52, 0.12)',
-                color: '#F9CE34',
+                border: '1px solid rgba(245, 158, 11, 0.4)',
+                background: 'rgba(245, 158, 11, 0.12)',
+                color: '#D97706',
                 fontSize: '12px',
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -339,8 +347,8 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
         {/* Card: Latest Conversation Date */}
         <div
           style={{
-            background: '#141414',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: palette.cardBg,
+            border: `1px solid ${palette.border}`,
             borderRadius: '16px',
             padding: '18px 20px',
             display: 'flex',
@@ -352,10 +360,10 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
             <div style={{ fontSize: '11px', color: '#833AB4', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span>📌</span> Latest Conversation Date
             </div>
-            <div style={{ fontSize: '17px', fontWeight: 800, color: '#FFF' }}>
+            <div style={{ fontSize: '17px', fontWeight: 800, color: palette.textPrimary }}>
               {lastMsgDate}
             </div>
-            <div style={{ fontSize: '11.5px', color: '#8E8E8E', marginTop: '2px' }}>
+            <div style={{ fontSize: '11.5px', color: palette.textSecondary, marginTop: '2px' }}>
               {lastMsgTime} {lastMsgSender ? `• by ${lastMsgSender}` : ''}
             </div>
           </div>
@@ -369,7 +377,7 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
                 borderRadius: '10px',
                 border: '1px solid rgba(131, 58, 180, 0.4)',
                 background: 'rgba(131, 58, 180, 0.12)',
-                color: '#C77DFF',
+                color: '#833AB4',
                 fontSize: '12px',
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -393,13 +401,13 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
         {/* Card 1: Message Share & Average Length */}
         <div
           style={{
-            background: '#141414',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: palette.cardBg,
+            border: `1px solid ${palette.border}`,
             borderRadius: '16px',
             padding: '20px'
           }}
         >
-          <div style={{ fontSize: '13px', fontWeight: 700, color: '#DDD', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: palette.textPrimary, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span>💬</span> Message Volume & Length Analysis
           </div>
 
@@ -413,7 +421,7 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
               height: '12px',
               borderRadius: '6px',
               overflow: 'hidden',
-              background: '#262626',
+              background: palette.cardInnerBg,
               display: 'flex',
               marginBottom: '16px'
             }}
@@ -424,22 +432,22 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
 
           {/* Average Text Length Comparison Box */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '12px' }}>
-            <div style={{ background: '#1F1F1F', padding: '12px', borderRadius: '12px', borderLeft: '3px solid #E1306C' }}>
-              <div style={{ fontSize: '10.5px', color: '#8E8E8E', fontWeight: 600 }}>{meName} Avg Length</div>
-              <div style={{ fontSize: '15px', fontWeight: 800, color: '#FFF', marginTop: '2px' }}>
-                {avgWordsMe} <span style={{ fontSize: '11px', color: '#A8A8A8', fontWeight: 400 }}>words ({avgCharsMe} chars)</span>
+            <div style={{ background: palette.cardInnerBg, padding: '12px', borderRadius: '12px', borderLeft: '3px solid #E1306C' }}>
+              <div style={{ fontSize: '10.5px', color: palette.textSecondary, fontWeight: 600 }}>{meName} Avg Length</div>
+              <div style={{ fontSize: '15px', fontWeight: 800, color: palette.textPrimary, marginTop: '2px' }}>
+                {avgWordsMe} <span style={{ fontSize: '11px', color: palette.textSecondary, fontWeight: 400 }}>words ({avgCharsMe} chars)</span>
               </div>
             </div>
 
-            <div style={{ background: '#1F1F1F', padding: '12px', borderRadius: '12px', borderLeft: '3px solid #833AB4' }}>
-              <div style={{ fontSize: '10.5px', color: '#8E8E8E', fontWeight: 600 }}>{partnerName} Avg Length</div>
-              <div style={{ fontSize: '15px', fontWeight: 800, color: '#FFF', marginTop: '2px' }}>
-                {avgWordsPartner} <span style={{ fontSize: '11px', color: '#A8A8A8', fontWeight: 400 }}>words ({avgCharsPartner} chars)</span>
+            <div style={{ background: palette.cardInnerBg, padding: '12px', borderRadius: '12px', borderLeft: '3px solid #833AB4' }}>
+              <div style={{ fontSize: '10.5px', color: palette.textSecondary, fontWeight: 600 }}>{partnerName} Avg Length</div>
+              <div style={{ fontSize: '15px', fontWeight: 800, color: palette.textPrimary, marginTop: '2px' }}>
+                {avgWordsPartner} <span style={{ fontSize: '11px', color: palette.textSecondary, fontWeight: 400 }}>words ({avgCharsPartner} chars)</span>
               </div>
             </div>
           </div>
 
-          <div style={{ fontSize: '11.5px', color: '#A8A8A8', marginTop: '12px', textAlign: 'center', fontWeight: 500 }}>
+          <div style={{ fontSize: '11.5px', color: palette.textSecondary, marginTop: '12px', textAlign: 'center', fontWeight: 500 }}>
             {avgWordsMe > avgWordsPartner
               ? `📝 ${meName} writes ${Math.round(((avgWordsMe - avgWordsPartner) / (avgWordsPartner || 1)) * 100)}% longer texts on average.`
               : avgWordsPartner > avgWordsMe
@@ -451,8 +459,8 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
         {/* Card 2: Reply Speed & Night Owl Index */}
         <div
           style={{
-            background: '#141414',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: palette.cardBg,
+            border: `1px solid ${palette.border}`,
             borderRadius: '16px',
             padding: '20px',
             display: 'flex',
@@ -461,21 +469,21 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
           }}
         >
           <div>
-            <div style={{ fontSize: '13px', fontWeight: 700, color: '#DDD', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ fontSize: '13px', fontWeight: 700, color: palette.textPrimary, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span>⚡</span> Reply Speed & Dynamics
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ background: '#1F1F1F', borderRadius: '12px', padding: '12px', borderLeft: '3px solid #E1306C' }}>
-                <div style={{ fontSize: '11px', color: '#8E8E8E', fontWeight: 600 }}>{meName} Reply Speed</div>
-                <div style={{ fontSize: '16px', fontWeight: 800, color: '#FFF', marginTop: '2px' }}>
+              <div style={{ background: palette.cardInnerBg, borderRadius: '12px', padding: '12px', borderLeft: '3px solid #E1306C' }}>
+                <div style={{ fontSize: '11px', color: palette.textSecondary, fontWeight: 600 }}>{meName} Reply Speed</div>
+                <div style={{ fontSize: '16px', fontWeight: 800, color: palette.textPrimary, marginTop: '2px' }}>
                   {avgResponseTimeMe}
                 </div>
               </div>
 
-              <div style={{ background: '#1F1F1F', borderRadius: '12px', padding: '12px', borderLeft: '3px solid #833AB4' }}>
-                <div style={{ fontSize: '11px', color: '#8E8E8E', fontWeight: 600 }}>{partnerName} Reply Speed</div>
-                <div style={{ fontSize: '16px', fontWeight: 800, color: '#FFF', marginTop: '2px' }}>
+              <div style={{ background: palette.cardInnerBg, borderRadius: '12px', padding: '12px', borderLeft: '3px solid #833AB4' }}>
+                <div style={{ fontSize: '11px', color: palette.textSecondary, fontWeight: 600 }}>{partnerName} Reply Speed</div>
+                <div style={{ fontSize: '16px', fontWeight: 800, color: palette.textPrimary, marginTop: '2px' }}>
                   {avgResponseTimePartner}
                 </div>
               </div>
@@ -483,31 +491,31 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
 
             {/* Late Night & Conversation Starters with Explicit Name Tags */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              <div style={{ background: '#1F1F1F', borderRadius: '12px', padding: '12px' }}>
-                <div style={{ fontSize: '10.5px', color: '#8E8E8E', fontWeight: 600, marginBottom: '4px' }}>🌙 Late Night (12–6 AM)</div>
-                <div style={{ fontSize: '15px', fontWeight: 800, color: '#F9CE34' }}>
-                  {lateNightTotal} <span style={{ fontSize: '11px', color: '#A8A8A8', fontWeight: 400 }}>msgs</span>
+              <div style={{ background: palette.cardInnerBg, borderRadius: '12px', padding: '12px' }}>
+                <div style={{ fontSize: '10.5px', color: palette.textSecondary, fontWeight: 600, marginBottom: '4px' }}>🌙 Late Night (12–6 AM)</div>
+                <div style={{ fontSize: '15px', fontWeight: 800, color: '#F59E0B' }}>
+                  {lateNightTotal} <span style={{ fontSize: '11px', color: palette.textSecondary, fontWeight: 400 }}>msgs</span>
                 </div>
                 <div style={{ display: 'flex', gap: '6px', marginTop: '6px', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '10px', color: '#FF6B98', fontWeight: 700, background: 'rgba(225, 48, 108, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
+                  <span style={{ fontSize: '10px', color: '#E1306C', fontWeight: 700, background: 'rgba(225, 48, 108, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
                     {meName}: {lateNightCountMe}
                   </span>
-                  <span style={{ fontSize: '10px', color: '#C77DFF', fontWeight: 700, background: 'rgba(131, 58, 180, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
+                  <span style={{ fontSize: '10px', color: '#833AB4', fontWeight: 700, background: 'rgba(131, 58, 180, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
                     {partnerName}: {lateNightCountPartner}
                   </span>
                 </div>
               </div>
 
-              <div style={{ background: '#1F1F1F', borderRadius: '12px', padding: '12px' }}>
-                <div style={{ fontSize: '10.5px', color: '#8E8E8E', fontWeight: 600, marginBottom: '4px' }}>💬 Chat Starters (&gt;4h break)</div>
-                <div style={{ fontSize: '15px', fontWeight: 800, color: '#4ADE80' }}>
-                  {initiationsMe + initiationsPartner} <span style={{ fontSize: '11px', color: '#A8A8A8', fontWeight: 400 }}>starts</span>
+              <div style={{ background: palette.cardInnerBg, borderRadius: '12px', padding: '12px' }}>
+                <div style={{ fontSize: '10.5px', color: palette.textSecondary, fontWeight: 600, marginBottom: '4px' }}>💬 Chat Starters (&gt;4h break)</div>
+                <div style={{ fontSize: '15px', fontWeight: 800, color: '#10B981' }}>
+                  {initiationsMe + initiationsPartner} <span style={{ fontSize: '11px', color: palette.textSecondary, fontWeight: 400 }}>starts</span>
                 </div>
                 <div style={{ display: 'flex', gap: '6px', marginTop: '6px', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '10px', color: '#FF6B98', fontWeight: 700, background: 'rgba(225, 48, 108, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
+                  <span style={{ fontSize: '10px', color: '#E1306C', fontWeight: 700, background: 'rgba(225, 48, 108, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
                     {meName}: {initiationsMe}
                   </span>
-                  <span style={{ fontSize: '10px', color: '#C77DFF', fontWeight: 700, background: 'rgba(131, 58, 180, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
+                  <span style={{ fontSize: '10px', color: '#833AB4', fontWeight: 700, background: 'rgba(131, 58, 180, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
                     {partnerName}: {initiationsPartner}
                   </span>
                 </div>
@@ -524,14 +532,14 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
         {/* Peak Hours Histogram */}
         <div
           style={{
-            background: '#141414',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: palette.cardBg,
+            border: `1px solid ${palette.border}`,
             borderRadius: '16px',
             padding: '20px'
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-            <div style={{ fontSize: '13px', fontWeight: 700, color: '#DDD', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ fontSize: '13px', fontWeight: 700, color: palette.textPrimary, display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span>⏰</span> Peak Hours Heatmap
             </div>
             <span style={{ fontSize: '10.5px', color: '#E1306C', fontWeight: 700, background: 'rgba(225, 48, 108, 0.15)', padding: '2px 8px', borderRadius: '6px' }}>
@@ -550,7 +558,7 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
                   style={{
                     flex: 1,
                     height: `${Math.max(hPct, 6)}%`,
-                    background: isPeak ? 'linear-gradient(to top, #E1306C, #FD1D1D)' : '#262626',
+                    background: isPeak ? 'linear-gradient(to top, #E1306C, #FD1D1D)' : palette.cardInnerBg,
                     borderRadius: '3px 3px 0 0',
                     transition: 'all 0.2s ease'
                   }}
@@ -558,7 +566,7 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
               );
             })}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9.5px', color: '#6E6E6E', marginTop: '6px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9.5px', color: palette.textSecondary, marginTop: '6px' }}>
             <span>12 AM</span>
             <span>6 AM</span>
             <span>12 PM</span>
@@ -570,14 +578,14 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
         {/* Peak Days Bar Chart */}
         <div
           style={{
-            background: '#141414',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: palette.cardBg,
+            border: `1px solid ${palette.border}`,
             borderRadius: '16px',
             padding: '20px'
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-            <div style={{ fontSize: '13px', fontWeight: 700, color: '#DDD', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ fontSize: '13px', fontWeight: 700, color: palette.textPrimary, display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span>📅</span> Activity by Day of Week
             </div>
             <span style={{ fontSize: '10.5px', color: '#833AB4', fontWeight: 700, background: 'rgba(131, 58, 180, 0.15)', padding: '2px 8px', borderRadius: '6px' }}>
@@ -596,12 +604,12 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
                     style={{
                       width: '100%',
                       height: `${Math.max(dPct, 8)}%`,
-                      background: isPeak ? 'linear-gradient(to top, #833AB4, #F77737)' : '#262626',
+                      background: isPeak ? 'linear-gradient(to top, #833AB4, #F77737)' : palette.cardInnerBg,
                       borderRadius: '4px 4px 0 0',
                       transition: 'all 0.2s ease'
                     }}
                   />
-                  <span style={{ fontSize: '9.5px', color: isPeak ? '#FFF' : '#6E6E6E', fontWeight: isPeak ? 700 : 400 }}>
+                  <span style={{ fontSize: '9.5px', color: isPeak ? palette.textPrimary : palette.textSecondary, fontWeight: isPeak ? 700 : 400 }}>
                     {dayNames[dIdx]}
                   </span>
                 </div>
@@ -617,13 +625,13 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
         {/* Top Emojis */}
         <div
           style={{
-            background: '#141414',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: palette.cardBg,
+            border: `1px solid ${palette.border}`,
             borderRadius: '16px',
             padding: '20px'
           }}
         >
-          <div style={{ fontSize: '13px', fontWeight: 700, color: '#DDD', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: palette.textPrimary, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span>😍</span> Top Emojis Exchanged
           </div>
 
@@ -633,8 +641,8 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
                 <div
                   key={eIdx}
                   style={{
-                    background: '#1F1F1F',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    background: palette.cardInnerBg,
+                    border: `1px solid ${palette.border}`,
                     borderRadius: '12px',
                     padding: '6px 12px',
                     display: 'flex',
@@ -643,36 +651,36 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
                   }}
                 >
                   <span style={{ fontSize: '18px' }}>{emoji}</span>
-                  <span style={{ fontSize: '11px', color: '#A8A8A8', fontWeight: 700 }}>x{count}</span>
+                  <span style={{ fontSize: '11px', color: palette.textSecondary, fontWeight: 700 }}>x{count}</span>
                 </div>
               ))}
             </div>
           ) : (
-            <div style={{ fontSize: '12px', color: '#6E6E6E' }}>No emojis detected.</div>
+            <div style={{ fontSize: '12px', color: palette.textSecondary }}>No emojis detected.</div>
           )}
         </div>
 
         {/* Media & Reels Shared */}
         <div
           style={{
-            background: '#141414',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: palette.cardBg,
+            border: `1px solid ${palette.border}`,
             borderRadius: '16px',
             padding: '20px'
           }}
         >
-          <div style={{ fontSize: '13px', fontWeight: 700, color: '#DDD', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: palette.textPrimary, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span>🎬</span> Shared Media & Reels
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', background: '#1F1F1F', padding: '8px 12px', borderRadius: '10px' }}>
-              <span style={{ color: '#A8A8A8' }}>Reels Shared</span>
-              <span style={{ color: '#FFF', fontWeight: 700 }}>{reelsMe} ({meName}) vs {reelsPartner} ({partnerName})</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', background: palette.cardInnerBg, padding: '8px 12px', borderRadius: '10px' }}>
+              <span style={{ color: palette.textSecondary }}>Reels Shared</span>
+              <span style={{ color: palette.textPrimary, fontWeight: 700 }}>{reelsMe} ({meName}) vs {reelsPartner} ({partnerName})</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', background: '#1F1F1F', padding: '8px 12px', borderRadius: '10px' }}>
-              <span style={{ color: '#A8A8A8' }}>Photos Sent</span>
-              <span style={{ color: '#FFF', fontWeight: 700 }}>{photosMe} vs {photosPartner}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', background: palette.cardInnerBg, padding: '8px 12px', borderRadius: '10px' }}>
+              <span style={{ color: palette.textSecondary }}>Photos Sent</span>
+              <span style={{ color: palette.textPrimary, fontWeight: 700 }}>{photosMe} vs {photosPartner}</span>
             </div>
           </div>
         </div>
@@ -680,13 +688,13 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
         {/* Top Keywords / Words */}
         <div
           style={{
-            background: '#141414',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
+            background: palette.cardBg,
+            border: `1px solid ${palette.border}`,
             borderRadius: '16px',
             padding: '20px'
           }}
         >
-          <div style={{ fontSize: '13px', fontWeight: 700, color: '#DDD', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: palette.textPrimary, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span>🔤</span> Top Keywords
           </div>
 
@@ -696,9 +704,9 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
                 <span
                   key={wIdx}
                   style={{
-                    background: wIdx === 0 ? 'linear-gradient(135deg, rgba(225, 48, 108, 0.2), rgba(131, 58, 180, 0.2))' : '#1F1F1F',
-                    border: wIdx === 0 ? '1px solid #E1306C' : '1px solid rgba(255, 255, 255, 0.08)',
-                    color: wIdx === 0 ? '#E1306C' : '#DBDBDB',
+                    background: wIdx === 0 ? 'linear-gradient(135deg, rgba(225, 48, 108, 0.2), rgba(131, 58, 180, 0.2))' : palette.cardInnerBg,
+                    border: wIdx === 0 ? '1px solid #E1306C' : `1px solid ${palette.border}`,
+                    color: wIdx === 0 ? '#E1306C' : palette.textPrimary,
                     fontSize: '11.5px',
                     fontWeight: 600,
                     padding: '4px 10px',
@@ -710,7 +718,7 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
               ))}
             </div>
           ) : (
-            <div style={{ fontSize: '12px', color: '#6E6E6E' }}>No text keywords.</div>
+            <div style={{ fontSize: '12px', color: palette.textSecondary }}>No text keywords.</div>
           )}
         </div>
 
@@ -1475,13 +1483,13 @@ export default function InstagramChatModal({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                background: '#262626',
+                background: colors.cardInnerBg,
                 borderRadius: '12px',
                 padding: '8px 12px',
-                border: '1px solid rgba(255, 255, 255, 0.08)'
+                border: `1px solid ${colors.border}`
               }}
             >
-              <IconSearch size={14} style={{ color: '#8E8E8E' }} />
+              <IconSearch size={14} style={{ color: colors.textSecondary }} />
               <input
                 type="text"
                 placeholder="Search chats..."
@@ -1491,7 +1499,7 @@ export default function InstagramChatModal({
                   background: 'transparent',
                   border: 'none',
                   outline: 'none',
-                  color: '#FFF',
+                  color: colors.textPrimary,
                   fontSize: '12.5px',
                   width: '100%'
                 }}
@@ -1499,7 +1507,7 @@ export default function InstagramChatModal({
               {threadSearchQuery && (
                 <button
                   onClick={() => setThreadSearchQuery('')}
-                  style={{ background: 'none', border: 'none', color: '#8E8E8E', cursor: 'pointer', padding: 0 }}
+                  style={{ background: 'none', border: 'none', color: colors.textSecondary, cursor: 'pointer', padding: 0 }}
                 >
                   <IconClose size={12} />
                 </button>
@@ -1516,13 +1524,6 @@ export default function InstagramChatModal({
                 const validMsgs = (thread.messages || []).filter(m => !isSystemEvent(m.content));
                 const latestMsg = validMsgs.length > 0 ? validMsgs[validMsgs.length - 1] : (thread.messages?.[thread.messages.length - 1] || null);
 
-                const initials = (thread.title || 'IG')
-                  .split(' ')
-                  .map(n => n[0])
-                  .join('')
-                  .substring(0, 2)
-                  .toUpperCase();
-
                 return (
                   <div
                     key={thread.threadKey}
@@ -1536,12 +1537,12 @@ export default function InstagramChatModal({
                       cursor: 'pointer',
                       marginBottom: '4px',
                       transition: 'all 0.15s ease',
-                      background: isSelected ? 'rgba(225, 48, 108, 0.16)' : 'transparent',
-                      border: isSelected ? '1px solid rgba(225, 48, 108, 0.35)' : '1px solid transparent'
+                      background: isSelected ? (isDark ? 'rgba(225, 48, 108, 0.16)' : '#FFF0F5') : 'transparent',
+                      border: isSelected ? (isDark ? '1px solid rgba(225, 48, 108, 0.35)' : '1px solid #FFD1DC') : '1px solid transparent'
                     }}
                   >
                     {/* Avatar with live profile photo & IG gradient outline */}
-                    <UserAvatar username={thread.title} title={thread.title} size={42} />
+                    <UserAvatar username={thread.title} title={thread.title} size={42} isDark={isDark} />
 
                     {/* Info */}
                     <div style={{ minWidth: 0, flex: 1 }}>
@@ -1557,7 +1558,7 @@ export default function InstagramChatModal({
                           style={{
                             fontSize: '13.5px',
                             fontWeight: 700,
-                            color: isSelected ? '#FFF' : '#E0E0E0',
+                            color: isSelected ? (isDark ? '#FFF' : '#E1306C') : colors.textPrimary,
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap'
@@ -1565,7 +1566,7 @@ export default function InstagramChatModal({
                         >
                           {thread.title}
                         </div>
-                        <span style={{ fontSize: '10px', color: '#8E8E8E', flexShrink: 0 }}>
+                        <span style={{ fontSize: '10px', color: colors.textSecondary, flexShrink: 0 }}>
                           {thread.latestDate || ''}
                         </span>
                       </div>
@@ -1573,7 +1574,7 @@ export default function InstagramChatModal({
                       <div
                         style={{
                           fontSize: '11.5px',
-                          color: '#A8A8A8',
+                          color: colors.textSecondary,
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap'
@@ -1588,8 +1589,8 @@ export default function InstagramChatModal({
                           style={{
                             fontSize: '10px',
                             fontWeight: 600,
-                            background: 'rgba(255, 255, 255, 0.08)',
-                            color: '#DBDBDB',
+                            background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+                            color: colors.textSecondary,
                             padding: '1px 6px',
                             borderRadius: '8px'
                           }}
@@ -1612,7 +1613,7 @@ export default function InstagramChatModal({
                 );
               })
             ) : (
-              <div style={{ textAlign: 'center', padding: '30px 10px', color: '#8E8E8E', fontSize: '12px' }}>
+              <div style={{ textAlign: 'center', padding: '30px 10px', color: colors.textSecondary, fontSize: '12px' }}>
                 No matching conversations found
               </div>
             )}
@@ -1626,7 +1627,7 @@ export default function InstagramChatModal({
             flex: 1,
             display: 'flex',
             flexDirection: 'column',
-            background: '#000000',
+            background: colors.chatBg,
             minWidth: 0,
             position: 'relative'
           }}
@@ -1637,23 +1638,23 @@ export default function InstagramChatModal({
               <div
                 style={{
                   padding: '14px 20px',
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderBottom: `1px solid ${colors.border}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  background: '#141414',
+                  background: colors.headerBg,
                   gap: '16px'
                 }}
               >
                 {/* Left: User Avatar & Names */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
-                  <UserAvatar username={activeThread.title} title={activeThread.title} size={40} />
+                  <UserAvatar username={activeThread.title} title={activeThread.title} size={40} isDark={isDark} />
                   <div style={{ minWidth: 0 }}>
                     <h4
                       style={{
                         fontSize: '15px',
                         fontWeight: 700,
-                        color: '#FFF',
+                        color: colors.textPrimary,
                         margin: 0,
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -1665,7 +1666,7 @@ export default function InstagramChatModal({
                     <div
                       style={{
                         fontSize: '11px',
-                        color: '#8E8E8E',
+                        color: colors.textSecondary,
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap'
@@ -1684,14 +1685,14 @@ export default function InstagramChatModal({
                         display: 'flex',
                         alignItems: 'center',
                         gap: '6px',
-                        background: '#1E1E1E',
+                        background: colors.cardInnerBg,
                         padding: '5px 12px',
                         borderRadius: '20px',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        border: `1px solid ${colors.border}`,
                         fontSize: '11.5px'
                       }}
                     >
-                      <span style={{ color: '#8E8E8E' }}>I am:</span>
+                      <span style={{ color: colors.textSecondary }}>I am:</span>
                       <select
                         value={mySenderName || ''}
                         onChange={(e) => setMySenderName(e.target.value)}
@@ -1706,7 +1707,7 @@ export default function InstagramChatModal({
                         }}
                       >
                         {activeSenders.map(s => (
-                          <option key={s} value={s} style={{ background: '#262626', color: '#FFF' }}>
+                          <option key={s} value={s} style={{ background: colors.cardBg, color: colors.textPrimary }}>
                             {s}
                           </option>
                         ))}
@@ -1723,9 +1724,9 @@ export default function InstagramChatModal({
                         }
                       }}
                       style={{
-                        background: '#262626',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        color: '#DBDBDB',
+                        background: colors.cardInnerBg,
+                        border: `1px solid ${colors.border}`,
+                        color: colors.textPrimary,
                         padding: '6px 10px',
                         borderRadius: '10px',
                         cursor: 'pointer',
@@ -1736,7 +1737,7 @@ export default function InstagramChatModal({
                     >
                       <option value="">📅 Jump to Month...</option>
                       {availableMonthYears.map((mStr, idx) => (
-                        <option key={idx} value={mStr} style={{ background: '#262626', color: '#FFF' }}>
+                        <option key={idx} value={mStr} style={{ background: colors.cardBg, color: colors.textPrimary }}>
                           {mStr}
                         </option>
                       ))}
@@ -1746,9 +1747,9 @@ export default function InstagramChatModal({
                   <button
                     onClick={() => setShowInChatSearch(!showInChatSearch)}
                     style={{
-                      background: showInChatSearch ? 'rgba(225, 48, 108, 0.25)' : '#262626',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      color: showInChatSearch ? '#E1306C' : '#DBDBDB',
+                      background: showInChatSearch ? 'rgba(225, 48, 108, 0.25)' : colors.cardInnerBg,
+                      border: `1px solid ${colors.border}`,
+                      color: showInChatSearch ? '#E1306C' : colors.textPrimary,
                       padding: '6px 12px',
                       borderRadius: '10px',
                       cursor: 'pointer',
@@ -1768,9 +1769,9 @@ export default function InstagramChatModal({
                     <button
                       onClick={onClose}
                       style={{
-                        background: '#262626',
+                        background: colors.cardInnerBg,
                         border: 'none',
-                        color: '#A8A8A8',
+                        color: colors.textSecondary,
                         width: '32px',
                         height: '32px',
                         borderRadius: '50%',
@@ -1790,8 +1791,8 @@ export default function InstagramChatModal({
               <div
                 style={{
                   padding: '8px 20px',
-                  background: '#0D0D0D',
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                  background: colors.headerBg,
+                  borderBottom: `1px solid ${colors.border}`,
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
@@ -1801,7 +1802,7 @@ export default function InstagramChatModal({
                 <div
                   style={{
                     display: 'flex',
-                    background: '#1E1E1E',
+                    background: colors.cardInnerBg,
                     borderRadius: '10px',
                     padding: '2px',
                     gap: '2px',
@@ -1818,7 +1819,7 @@ export default function InstagramChatModal({
                       fontWeight: 600,
                       cursor: 'pointer',
                       background: filterType === 'all' ? 'linear-gradient(135deg, #E1306C, #833AB4)' : 'transparent',
-                      color: filterType === 'all' ? '#FFF' : '#A8A8A8'
+                      color: filterType === 'all' ? '#FFF' : colors.textSecondary
                     }}
                   >
                     All ({activeThread.messageCount})
@@ -1836,7 +1837,7 @@ export default function InstagramChatModal({
                       alignItems: 'center',
                       gap: '4px',
                       background: filterType === 'media' ? 'linear-gradient(135deg, #E1306C, #833AB4)' : 'transparent',
-                      color: filterType === 'media' ? '#FFF' : '#A8A8A8'
+                      color: filterType === 'media' ? '#FFF' : colors.textSecondary
                     }}
                   >
                     <IconImage size={11} /> Media ({(activeThread.photosCount || 0) + (activeThread.videosCount || 0)})
@@ -1854,7 +1855,7 @@ export default function InstagramChatModal({
                       alignItems: 'center',
                       gap: '4px',
                       background: filterType === 'reels' ? 'linear-gradient(135deg, #E1306C, #833AB4)' : 'transparent',
-                      color: filterType === 'reels' ? '#FFF' : '#A8A8A8'
+                      color: filterType === 'reels' ? '#FFF' : colors.textSecondary
                     }}
                   >
                     <IconVideo size={11} /> Reels ({activeThread.reelsCount || 0})
@@ -1872,7 +1873,7 @@ export default function InstagramChatModal({
                       alignItems: 'center',
                       gap: '4px',
                       background: filterType === 'audio' ? 'linear-gradient(135deg, #E1306C, #833AB4)' : 'transparent',
-                      color: filterType === 'audio' ? '#FFF' : '#A8A8A8'
+                      color: filterType === 'audio' ? '#FFF' : colors.textSecondary
                     }}
                   >
                     <IconMusic size={11} /> Audio ({activeThread.audioCount || 0})
@@ -1890,7 +1891,7 @@ export default function InstagramChatModal({
                       alignItems: 'center',
                       gap: '4px',
                       background: filterType === 'analytics' ? 'linear-gradient(135deg, #E1306C, #833AB4)' : 'transparent',
-                      color: filterType === 'analytics' ? '#FFF' : '#A8A8A8'
+                      color: filterType === 'analytics' ? '#FFF' : colors.textSecondary
                     }}
                   >
                     <IconZap size={11} /> Analytics 📊
@@ -1926,8 +1927,8 @@ export default function InstagramChatModal({
                 <div
                   style={{
                     padding: '10px 20px',
-                    background: '#1A1A1A',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                    background: colors.headerBg,
+                    borderBottom: `1px solid ${colors.border}`,
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px'
@@ -1942,11 +1943,11 @@ export default function InstagramChatModal({
                     autoFocus
                     style={{
                       flex: 1,
-                      background: '#262626',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      background: colors.cardInnerBg,
+                      border: `1px solid ${colors.border}`,
                       borderRadius: '10px',
                       padding: '8px 14px',
-                      color: '#FFF',
+                      color: colors.textPrimary,
                       fontSize: '13px',
                       outline: 'none'
                     }}
@@ -1964,7 +1965,7 @@ export default function InstagramChatModal({
                     style={{
                       background: 'transparent',
                       border: 'none',
-                      color: '#8E8E8E',
+                      color: colors.textSecondary,
                       cursor: 'pointer',
                       fontSize: '12px'
                     }}
@@ -1983,7 +1984,7 @@ export default function InstagramChatModal({
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '12px',
-                  background: '#0D0D0D'
+                  background: colors.chatBg
                 }}
               >
                 {filterType === 'analytics' ? (
@@ -1992,6 +1993,8 @@ export default function InstagramChatModal({
                     thread={activeThread}
                     onOpenRecap={() => setShowRecapModal(true)}
                     onJumpToMessage={handleJumpToMessage}
+                    colors={colors}
+                    isDark={isDark}
                   />
                 ) : groupedMessages.length > 0 ? (
                   groupedMessages.map((item) => {
@@ -1999,6 +2002,7 @@ export default function InstagramChatModal({
                       return (
                         <div
                           key={item.key}
+                          id={`date-header-${item.date}`}
                           style={{
                             textAlign: 'center',
                             margin: '16px 0 8px 0'
@@ -2006,15 +2010,15 @@ export default function InstagramChatModal({
                         >
                           <span
                             style={{
-                              background: '#1F1F1F',
-                              color: '#8E8E8E',
+                              background: colors.cardInnerBg,
+                              color: colors.textSecondary,
                               fontSize: '10.5px',
                               fontWeight: 700,
                               padding: '4px 14px',
                               borderRadius: '12px',
                               textTransform: 'uppercase',
                               letterSpacing: '0.5px',
-                              border: '1px solid rgba(255, 255, 255, 0.05)'
+                              border: `1px solid ${colors.border}`
                             }}
                           >
                             {item.date}
@@ -2035,13 +2039,13 @@ export default function InstagramChatModal({
                             textAlign: 'center',
                             margin: '4px 0',
                             fontSize: '11px',
-                            color: '#8E8E8E'
+                            color: colors.textSecondary
                           }}
                         >
                           <span
                             style={{
-                              background: 'rgba(255, 255, 255, 0.04)',
-                              border: '1px solid rgba(255, 255, 255, 0.06)',
+                              background: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.04)',
+                              border: `1px solid ${colors.border}`,
                               padding: '3px 10px',
                               borderRadius: '10px',
                               display: 'inline-block'
@@ -2117,7 +2121,7 @@ export default function InstagramChatModal({
                           <span
                             style={{
                               fontSize: '10.5px',
-                              color: '#8E8E8E',
+                              color: colors.textSecondary,
                               marginBottom: '3px',
                               marginLeft: '36px',
                               fontWeight: 600
@@ -2130,7 +2134,7 @@ export default function InstagramChatModal({
                         {/* Flex Row containing Received User Avatar + Message Bubble */}
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end', width: '100%', justifyContent: isOwner ? 'flex-end' : 'flex-start' }}>
                           {!isOwner && (
-                            <UserAvatar username={msg.sender} title={msg.sender} size={28} style={{ marginBottom: '4px' }} />
+                            <UserAvatar username={msg.sender} title={msg.sender} size={28} style={{ marginBottom: '4px' }} isDark={isDark} />
                           )}
 
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: isOwner ? 'flex-end' : 'flex-start', maxWidth: '100%' }}>
@@ -2141,8 +2145,8 @@ export default function InstagramChatModal({
                                 <button
                                   onClick={() => setExpandedEditsMap(prev => ({ ...prev, [msg.id]: !prev[msg.id] }))}
                                   style={{
-                                    background: '#262626',
-                                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                                    background: colors.cardInnerBg,
+                                    border: `1px solid ${colors.border}`,
                                     color: '#3B82F6', // Blue link style matching user screenshot
                                     fontSize: '11px',
                                     fontWeight: 700,
@@ -2152,7 +2156,7 @@ export default function InstagramChatModal({
                                     display: 'inline-flex',
                                     alignItems: 'center',
                                     gap: '4px',
-                                    boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
+                                    boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
                                     transition: 'all 0.15s ease'
                                   }}
                                   title="Click to toggle edit history"
@@ -2171,16 +2175,16 @@ export default function InstagramChatModal({
                                     style={{
                                       padding: '8px 14px',
                                       borderRadius: isOwner ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                                      background: '#2A2A2A',
-                                      color: '#8E8E8E', // Faded previous draft text matching user screenshot
+                                      background: colors.cardInnerBg,
+                                      color: colors.textSecondary, // Faded previous draft text matching user screenshot
                                       fontSize: '13px',
                                       lineHeight: '1.4',
-                                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                                      boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                                      border: `1px solid ${colors.border}`,
+                                      boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
                                       maxWidth: '100%'
                                     }}
                                   >
-                                    <span style={{ fontSize: '9px', color: '#6E6E6E', display: 'block', marginBottom: '2px', fontWeight: 600 }}>
+                                    <span style={{ fontSize: '9px', color: colors.textSecondary, display: 'block', marginBottom: '2px', fontWeight: 600 }}>
                                       Previous draft {dIdx + 1}:
                                     </span>
                                     {draftText}
@@ -2203,8 +2207,8 @@ export default function InstagramChatModal({
                                 wordBreak: 'break-word',
                                 boxShadow: isOwner
                                   ? '0 4px 14px rgba(225, 48, 108, 0.3)'
-                                  : '0 2px 8px rgba(0, 0, 0, 0.3)',
-                                border: isOwner ? 'none' : '1px solid rgba(255, 255, 255, 0.06)'
+                                  : '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                border: isOwner ? 'none' : `1px solid ${colors.border}`
                               }}
                             >
                               {/* Text Content */}
@@ -2224,10 +2228,10 @@ export default function InstagramChatModal({
                                   style={{
                                     marginTop: msg.content ? '8px' : 0,
                                     padding: '10px 12px',
-                                    background: 'rgba(0, 0, 0, 0.35)',
+                                    background: isDark ? 'rgba(0, 0, 0, 0.35)' : 'rgba(0, 0, 0, 0.05)',
                                     borderRadius: '14px',
                                     fontSize: '12px',
-                                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                                    border: `1px solid ${colors.border}`,
                                     maxWidth: '320px'
                                   }}
                                 >
@@ -2238,7 +2242,7 @@ export default function InstagramChatModal({
                                   <div
                                     style={{
                                       fontSize: '11.5px',
-                                      color: '#DDD',
+                                      color: colors.textPrimary,
                                       overflow: 'hidden',
                                       textOverflow: 'ellipsis',
                                       display: '-webkit-box',
@@ -2256,7 +2260,7 @@ export default function InstagramChatModal({
                                       rel="noreferrer"
                                       style={{
                                         fontSize: '11px',
-                                        color: '#FFF',
+                                        color: isOwner ? '#FFF' : '#E1306C',
                                         textDecoration: 'underline',
                                         display: 'inline-flex',
                                         alignItems: 'center',
@@ -2286,8 +2290,8 @@ export default function InstagramChatModal({
                                       cursor: 'pointer',
                                       maxWidth: '240px',
                                       maxHeight: '240px',
-                                      background: '#181818',
-                                      border: '1px solid rgba(255, 255, 255, 0.1)'
+                                      background: colors.cardInnerBg,
+                                      border: `1px solid ${colors.border}`
                                     }}
                                   >
                                     {blobUrl ? (
@@ -2304,7 +2308,7 @@ export default function InstagramChatModal({
                                           flexDirection: 'column',
                                           alignItems: 'center',
                                           gap: '6px',
-                                          color: '#A8A8A8',
+                                          color: colors.textSecondary,
                                           fontSize: '11px'
                                         }}
                                       >
@@ -2332,12 +2336,13 @@ export default function InstagramChatModal({
                                       <div
                                         style={{
                                           padding: '14px',
-                                          background: 'rgba(0,0,0,0.3)',
+                                          background: colors.cardInnerBg,
                                           borderRadius: '10px',
                                           display: 'flex',
                                           alignItems: 'center',
                                           gap: '8px',
-                                          fontSize: '11.5px'
+                                          fontSize: '11.5px',
+                                          color: colors.textPrimary
                                         }}
                                       >
                                         <IconVideo size={18} style={{ color: '#E1306C' }} />
@@ -2365,8 +2370,9 @@ export default function InstagramChatModal({
                                       alignItems: 'center',
                                       gap: '12px',
                                       padding: '8px 12px',
-                                      background: 'rgba(0, 0, 0, 0.35)',
+                                      background: isDark ? 'rgba(0, 0, 0, 0.35)' : 'rgba(0, 0, 0, 0.05)',
                                       borderRadius: '14px',
+                                      border: `1px solid ${colors.border}`,
                                       minWidth: '220px'
                                     }}
                                   >
@@ -2398,7 +2404,7 @@ export default function InstagramChatModal({
                                             style={{
                                               flex: 1,
                                               height: `${h}%`,
-                                              background: isPlaying ? '#E1306C' : '#A8A8A8',
+                                              background: isPlaying ? '#E1306C' : (isDark ? '#A8A8A8' : '#9CA3AF'),
                                               borderRadius: '2px',
                                               transition: 'all 0.2s ease'
                                             }}
@@ -2411,7 +2417,7 @@ export default function InstagramChatModal({
                                           alignItems: 'center',
                                           justifyContent: 'space-between',
                                           fontSize: '10px',
-                                          color: '#A8A8A8'
+                                          color: colors.textSecondary
                                         }}
                                       >
                                         <span>🎵 Voice Note</span>
@@ -2439,15 +2445,15 @@ export default function InstagramChatModal({
                               marginTop: '-6px',
                               marginRight: isOwner ? '10px' : '0px',
                               marginLeft: !isOwner ? '10px' : '0px',
-                              background: '#1A1A1A',
-                              border: '1px solid rgba(255, 255, 255, 0.15)',
+                              background: colors.cardInnerBg,
+                              border: `1px solid ${colors.border}`,
                               borderRadius: '12px',
                               padding: '2px 7px',
                               fontSize: '11px',
                               display: 'flex',
                               alignItems: 'center',
                               gap: '4px',
-                              boxShadow: '0 2px 6px rgba(0,0,0,0.5)',
+                              boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
                               zIndex: 2
                             }}
                             title={msg.reactions.map(r => `${r.actor}: ${r.reaction}`).join('\n')}
@@ -2461,7 +2467,7 @@ export default function InstagramChatModal({
                         <span
                           style={{
                             fontSize: '9.5px',
-                            color: '#6E6E6E',
+                            color: colors.textSecondary,
                             marginTop: '3px',
                             padding: '0 4px'
                           }}
@@ -2474,8 +2480,8 @@ export default function InstagramChatModal({
                 );
                   })
                 ) : (
-                  <div style={{ textAlign: 'center', padding: '60px 20px', color: '#8E8E8E' }}>
-                    <IconMessage size={32} style={{ marginBottom: '12px', color: '#333' }} />
+                  <div style={{ textAlign: 'center', padding: '60px 20px', color: colors.textSecondary }}>
+                    <IconMessage size={32} style={{ marginBottom: '12px', color: colors.textSecondary }} />
                     <p style={{ fontSize: '13px' }}>No messages found matching your search filter.</p>
                   </div>
                 )}
@@ -2486,13 +2492,13 @@ export default function InstagramChatModal({
               <div
                 style={{
                   padding: '10px 20px',
-                  background: '#121212',
-                  borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                  background: colors.headerBg,
+                  borderTop: `1px solid ${colors.border}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   fontSize: '11px',
-                  color: '#8E8E8E'
+                  color: colors.textSecondary
                 }}
               >
                 <span>
