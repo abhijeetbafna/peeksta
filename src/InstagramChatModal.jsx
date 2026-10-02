@@ -388,7 +388,7 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
             </h3>
           </div>
           <p style={{ fontSize: '12.5px', color: palette.textSecondary, margin: 0 }}>
-            Deep analytics for <strong>{thread.title}</strong> across {totalMsgs.toLocaleString()} messages
+            Deep analytics for <strong>{thread?.title || 'Conversation'}</strong> across {(totalMsgs || 0).toLocaleString()} messages
           </p>
         </div>
 

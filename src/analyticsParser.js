@@ -281,7 +281,7 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
 
   for (let i = 0; i < messages.length; i++) {
     const msg = messages[i];
-    const isMe = msg.sender === meName || (currentUserName && msg.sender.toLowerCase() === currentUserName.toLowerCase());
+    const isMe = msg && msg.sender ? (msg.sender === meName || (currentUserName && msg.sender.toLowerCase() === currentUserName.toLowerCase())) : false;
 
     if (isMe) meCount++;
     else partnerCount++;
@@ -436,7 +436,7 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
 
   for (let i = 0; i < messages.length; i++) {
     const msg = messages[i];
-    const isMe = msg.sender === meName || (currentUserName && msg.sender.toLowerCase() === currentUserName.toLowerCase());
+    const isMe = msg && msg.sender ? (msg.sender === meName || (currentUserName && msg.sender.toLowerCase() === currentUserName.toLowerCase())) : false;
 
     if (i > 0 && messages[i - 1].sender === msg.sender) {
       if (isMe) doubleTextingMe++;
@@ -522,7 +522,7 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
     if (Array.isArray(msg.reactions)) {
       for (const r of msg.reactions) {
         const actorName = r.actor || '';
-        const isMeActor = actorName === meName || (currentUserName && actorName.toLowerCase() === currentUserName.toLowerCase());
+        const isMeActor = actorName ? (actorName === meName || (currentUserName && actorName.toLowerCase() === currentUserName.toLowerCase())) : false;
         const emoji = r.reaction || '❤️';
         const targetMap = isMeActor ? reactionsMeMap : reactionsPartnerMap;
         targetMap.set(emoji, (targetMap.get(emoji) || 0) + 1);
