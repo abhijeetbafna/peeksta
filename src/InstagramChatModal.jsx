@@ -101,6 +101,194 @@ export function UserAvatar({ username, title, size = 38, style = {}, isDark = tr
   );
 }
 
+// MediaVaultView Component: Displays a dedicated gallery grid for photos, videos, reels, and a voice notes playlist
+export function MediaVaultView({ thread, mediaUrls, setPreviewImage, handleToggleAudio, playingAudioId, colors, isDark = true }) {
+  const palette = colors || {
+    cardBg: isDark ? '#141414' : '#FFFFFF',
+    cardInnerBg: isDark ? '#1F1F1F' : '#F3F4F6',
+    textPrimary: isDark ? '#FFFFFF' : '#111827',
+    textSecondary: isDark ? '#8E8E8E' : '#6B7280',
+    border: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'
+  };
+
+  const messages = thread ? (thread.messages || []) : [];
+  const photosList = messages.filter(m => m.photos && m.photos.length > 0);
+  const audioList = messages.filter(m => m.audioFiles && m.audioFiles.length > 0);
+  const reelsList = messages.filter(m => isReelMessage(m));
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '10px 4px 30px 4px' }}>
+      
+      {/* Banner */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, rgba(225, 48, 108, 0.15) 0%, rgba(131, 58, 180, 0.15) 100%)',
+          border: '1px solid rgba(225, 48, 108, 0.3)',
+          borderRadius: '16px',
+          padding: '20px 24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+      >
+        <div>
+          <h3 style={{ fontSize: '18px', fontWeight: 700, color: palette.textPrimary, margin: '0 0 4px 0' }}>
+            🖼️ Media & Voice Notes Vault
+          </h3>
+          <p style={{ fontSize: '12.5px', color: palette.textSecondary, margin: 0 }}>
+            Centralized gallery of all photos ({thread?.photosCount || 0}), voice notes ({thread?.audioCount || 0}), and shared reels ({thread?.reelsCount || 0}) in <strong>{thread?.title}</strong>
+          </p>
+        </div>
+      </div>
+
+      {/* Photo Gallery Grid */}
+      <div style={{ background: palette.cardBg, border: `1px solid ${palette.border}`, borderRadius: '16px', padding: '20px' }}>
+        <h4 style={{ fontSize: '14px', fontWeight: 700, color: palette.textPrimary, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span>📷</span> Photo Gallery ({photosList.length} messages)
+        </h4>
+        {photosList.length > 0 ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '10px' }}>
+            {photosList.flatMap((m) =>
+              (m.photos || []).map((p, pIdx) => {
+                const blobUrl = mediaUrls[p.uri];
+                return (
+                  <div
+                    key={`${m.id}_${pIdx}`}
+                    onClick={() => blobUrl && setPreviewImage(blobUrl)}
+                    style={{
+                      height: '130px',
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      background: palette.cardInnerBg,
+                      border: `1px solid ${palette.border}`,
+                      cursor: blobUrl ? 'pointer' : 'default',
+                      position: 'relative'
+                    }}
+                  >
+                    {blobUrl ? (
+                      <img src={blobUrl} alt="Photo" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: palette.textSecondary, fontSize: '10.5px', padding: '8px', textAlign: 'center' }}>
+                        <IconImage size={24} style={{ color: '#E1306C', marginBottom: '4px' }} />
+                        <span>📷 Photo</span>
+                        <span style={{ fontSize: '9px', opacity: 0.7 }}>{m.formattedDate}</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        ) : (
+          <div style={{ fontSize: '12px', color: palette.textSecondary }}>No photos exchanged in this conversation.</div>
+        )}
+      </div>
+
+      {/* Shared Reels Vault */}
+      <div style={{ background: palette.cardBg, border: `1px solid ${palette.border}`, borderRadius: '16px', padding: '20px' }}>
+        <h4 style={{ fontSize: '14px', fontWeight: 700, color: palette.textPrimary, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span>🎬</span> Shared Instagram Reels & Posts ({reelsList.length})
+        </h4>
+        {reelsList.length > 0 ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px' }}>
+            {reelsList.map((m) => (
+              <div
+                key={m.id}
+                style={{
+                  background: palette.cardInnerBg,
+                  borderRadius: '12px',
+                  padding: '12px',
+                  border: `1px solid ${palette.border}`,
+                  fontSize: '12px'
+                }}
+              >
+                <div style={{ fontWeight: 700, color: '#E1306C', marginBottom: '4px' }}>
+                  🎬 Shared by {m.sender}
+                </div>
+                <div style={{ color: palette.textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', marginBottom: '6px' }}>
+                  {m.share?.shareText || m.share?.link || m.content}
+                </div>
+                {m.share?.link && (
+                  <a href={m.share.link} target="_blank" rel="noreferrer" style={{ color: '#3B82F6', fontSize: '11px', fontWeight: 600 }}>
+                    Open on Instagram →
+                  </a>
+                )}
+                <div style={{ fontSize: '9.5px', color: palette.textSecondary, marginTop: '4px' }}>
+                  {m.formattedDate} at {m.formattedTime}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ fontSize: '12px', color: palette.textSecondary }}>No reels shared in this conversation.</div>
+        )}
+      </div>
+
+      {/* Voice Notes Playlist */}
+      <div style={{ background: palette.cardBg, border: `1px solid ${palette.border}`, borderRadius: '16px', padding: '20px' }}>
+        <h4 style={{ fontSize: '14px', fontWeight: 700, color: palette.textPrimary, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span>🎵</span> Voice Notes Playlist ({audioList.length} messages)
+        </h4>
+        {audioList.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {audioList.flatMap((m) =>
+              (m.audioFiles || []).map((aud, aIdx) => {
+                const blobUrl = mediaUrls[aud.uri];
+                const isPlaying = playingAudioId === `${m.id}_${aIdx}`;
+                return (
+                  <div
+                    key={`${m.id}_${aIdx}`}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '10px 14px',
+                      background: palette.cardInnerBg,
+                      borderRadius: '12px',
+                      border: `1px solid ${palette.border}`
+                    }}
+                  >
+                    <button
+                      onClick={() => handleToggleAudio(`${m.id}_${aIdx}`, blobUrl)}
+                      disabled={!blobUrl}
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '50%',
+                        background: isPlaying ? '#E1306C' : 'linear-gradient(135deg, #E1306C, #833AB4)',
+                        border: 'none',
+                        color: '#FFF',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: blobUrl ? 'pointer' : 'not-allowed',
+                        flexShrink: 0
+                      }}
+                    >
+                      {isPlaying ? <IconPause size={14} /> : <IconPlay size={14} />}
+                    </button>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '12.5px', fontWeight: 700, color: palette.textPrimary }}>
+                        Voice Message from {m.sender}
+                      </div>
+                      <div style={{ fontSize: '10.5px', color: palette.textSecondary }}>
+                        {m.formattedDate} at {m.formattedTime} {blobUrl ? '• Ready to play' : ''}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        ) : (
+          <div style={{ fontSize: '12px', color: palette.textSecondary }}>No voice notes in this conversation.</div>
+        )}
+      </div>
+
+    </div>
+  );
+}
+
 // ThreadAnalyticsView Component: Renders visual conversation metrics, timeline milestones, text length averages, reply speeds & top emojis
 export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMessage, colors, isDark = true }) {
   const palette = colors || {
@@ -2025,6 +2213,24 @@ export default function InstagramChatModal({
                     <IconMusic size={11} /> Audio ({activeThread.audioCount || 0})
                   </button>
                   <button
+                    onClick={() => setFilterType('vault')}
+                    style={{
+                      padding: '5px 12px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      background: filterType === 'vault' ? 'linear-gradient(135deg, #E1306C, #833AB4)' : 'transparent',
+                      color: filterType === 'vault' ? '#FFF' : colors.textSecondary
+                    }}
+                  >
+                    📦 Media Vault ({(activeThread.photosCount || 0) + (activeThread.reelsCount || 0) + (activeThread.audioCount || 0)})
+                  </button>
+                  <button
                     onClick={() => setFilterType('analytics')}
                     style={{
                       padding: '5px 12px',
@@ -2200,7 +2406,17 @@ export default function InstagramChatModal({
                   </div>
                 )}
 
-                {filterType === 'analytics' ? (
+                {filterType === 'vault' ? (
+                  <MediaVaultView
+                    thread={activeThread}
+                    mediaUrls={mediaUrls}
+                    setPreviewImage={setPreviewImage}
+                    handleToggleAudio={handleToggleAudio}
+                    playingAudioId={playingAudioId}
+                    colors={colors}
+                    isDark={isDark}
+                  />
+                ) : filterType === 'analytics' ? (
                   <ThreadAnalyticsView
                     analytics={computeThreadAnalytics(activeThread, mySenderName)}
                     thread={activeThread}
@@ -2265,6 +2481,11 @@ export default function InstagramChatModal({
                             }}
                           >
                             <strong>{msg.sender}</strong> {msg.content}
+                            {msg.formattedTime && (
+                              <span style={{ opacity: 0.65, fontSize: '10px', marginLeft: '6px' }}>
+                                • {msg.formattedTime}
+                              </span>
+                            )}
                           </span>
                         </div>
                       );
