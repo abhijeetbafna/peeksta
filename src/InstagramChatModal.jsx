@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import JSZip from 'jszip';
 import { parseMessageThread, mergeThreadsList, isReelMessage, computeThreadAnalytics } from './analyticsParser';
 import ChatRecapModal from './ChatRecapModal';
@@ -311,9 +311,9 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
             </div>
           </div>
 
-          {onJumpToMessage && peakDateMsgId && (
+          {onJumpToMessage && (peakDateMsgId || peakDateStr) && (
             <button
-              onClick={() => onJumpToMessage(peakDateMsgId)}
+              onClick={() => onJumpToMessage(peakDateMsgId, peakDateStr)}
               style={{
                 marginTop: '14px',
                 padding: '8px 12px',
@@ -360,9 +360,9 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
             </div>
           </div>
 
-          {onJumpToMessage && lastMsgId && (
+          {onJumpToMessage && (lastMsgId || lastMsgDate) && (
             <button
-              onClick={() => onJumpToMessage(lastMsgId)}
+              onClick={() => onJumpToMessage(lastMsgId, lastMsgDate)}
               style={{
                 marginTop: '14px',
                 padding: '8px 12px',
@@ -481,19 +481,35 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
               </div>
             </div>
 
-            {/* Late Night & Conversation Starters */}
+            {/* Late Night & Conversation Starters with Explicit Name Tags */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              <div style={{ background: '#1F1F1F', borderRadius: '12px', padding: '10px 12px' }}>
-                <div style={{ fontSize: '10.5px', color: '#8E8E8E', fontWeight: 600 }}>🌙 Late Night (12-6 AM)</div>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#F9CE34', marginTop: '2px' }}>
-                  {lateNightTotal} <span style={{ fontSize: '10.5px', color: '#A8A8A8', fontWeight: 400 }}>({lateNightCountMe} vs {lateNightCountPartner})</span>
+              <div style={{ background: '#1F1F1F', borderRadius: '12px', padding: '12px' }}>
+                <div style={{ fontSize: '10.5px', color: '#8E8E8E', fontWeight: 600, marginBottom: '4px' }}>🌙 Late Night (12–6 AM)</div>
+                <div style={{ fontSize: '15px', fontWeight: 800, color: '#F9CE34' }}>
+                  {lateNightTotal} <span style={{ fontSize: '11px', color: '#A8A8A8', fontWeight: 400 }}>msgs</span>
+                </div>
+                <div style={{ display: 'flex', gap: '6px', marginTop: '6px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '10px', color: '#FF6B98', fontWeight: 700, background: 'rgba(225, 48, 108, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
+                    {meName}: {lateNightCountMe}
+                  </span>
+                  <span style={{ fontSize: '10px', color: '#C77DFF', fontWeight: 700, background: 'rgba(131, 58, 180, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
+                    {partnerName}: {lateNightCountPartner}
+                  </span>
                 </div>
               </div>
 
-              <div style={{ background: '#1F1F1F', borderRadius: '12px', padding: '10px 12px' }}>
-                <div style={{ fontSize: '10.5px', color: '#8E8E8E', fontWeight: 600 }}>💬 Chat Initiations</div>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#4ADE80', marginTop: '2px' }}>
-                  {initiationsMe + initiationsPartner} <span style={{ fontSize: '10.5px', color: '#A8A8A8', fontWeight: 400 }}>({initiationsMe} vs {initiationsPartner})</span>
+              <div style={{ background: '#1F1F1F', borderRadius: '12px', padding: '12px' }}>
+                <div style={{ fontSize: '10.5px', color: '#8E8E8E', fontWeight: 600, marginBottom: '4px' }}>💬 Chat Starters (&gt;4h break)</div>
+                <div style={{ fontSize: '15px', fontWeight: 800, color: '#4ADE80' }}>
+                  {initiationsMe + initiationsPartner} <span style={{ fontSize: '11px', color: '#A8A8A8', fontWeight: 400 }}>starts</span>
+                </div>
+                <div style={{ display: 'flex', gap: '6px', marginTop: '6px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '10px', color: '#FF6B98', fontWeight: 700, background: 'rgba(225, 48, 108, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
+                    {meName}: {initiationsMe}
+                  </span>
+                  <span style={{ fontSize: '10px', color: '#C77DFF', fontWeight: 700, background: 'rgba(131, 58, 180, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
+                    {partnerName}: {initiationsPartner}
+                  </span>
                 </div>
               </div>
             </div>
@@ -727,21 +743,37 @@ export default function InstagramChatModal({
   const [expandedEditsMap, setExpandedEditsMap] = useState({}); // Track expanded edit history per msg
   const [showRecapModal, setShowRecapModal] = useState(false);
   const [highlightedMsgId, setHighlightedMsgId] = useState(null);
+  const [highlightedDateStr, setHighlightedDateStr] = useState(null);
 
-  const handleJumpToMessage = (msgId) => {
-    if (!msgId) return;
+  const handleJumpToMessage = (msgId, dateStr = null) => {
     setFilterType('all');
-    setHighlightedMsgId(msgId);
+    setChatSearchQuery('');
+    setShowInChatSearch(false);
+    if (msgId) setHighlightedMsgId(msgId);
+    if (dateStr) setHighlightedDateStr(dateStr);
 
     setTimeout(() => {
-      const el = document.getElementById(`msg-item-${msgId}`);
+      let el = null;
+      if (msgId) el = document.getElementById(`msg-item-${msgId}`);
+      if (!el && dateStr) el = document.getElementById(`date-header-${dateStr}`);
+
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (dateStr) {
+        // Fallback search by text matching
+        const allDateElements = document.querySelectorAll('[id^="date-header-"]');
+        for (const dateEl of allDateElements) {
+          if (dateEl.textContent.includes(dateStr) || dateStr.includes(dateEl.textContent)) {
+            dateEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            break;
+          }
+        }
       }
     }, 150);
 
     setTimeout(() => {
       setHighlightedMsgId(null);
+      setHighlightedDateStr(null);
     }, 3500);
   };
 
@@ -761,6 +793,20 @@ export default function InstagramChatModal({
 
   // Auto-detect available senders in active thread
   const activeSenders = activeThread ? Array.from(new Set(activeThread.messages.map(m => m.sender).filter(Boolean))) : [];
+
+  // Collect available Month/Year dates for quick jumping dropdown
+  const availableMonthYears = useMemo(() => {
+    if (!activeThread || !activeThread.messages) return [];
+    const set = new Set();
+    activeThread.messages.forEach(m => {
+      if (m.timestamp > 0) {
+        const d = new Date(m.timestamp);
+        const monthYear = d.toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
+        set.add(monthYear);
+      }
+    });
+    return Array.from(set);
+  }, [activeThread]);
 
   // Reset or auto-determine "My Sender Name" when thread changes
   useEffect(() => {
@@ -1611,6 +1657,35 @@ export default function InstagramChatModal({
                         ))}
                       </select>
                     </div>
+                  )}
+
+                  {availableMonthYears.length > 0 && (
+                    <select
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          handleJumpToMessage(null, e.target.value);
+                          e.target.value = '';
+                        }
+                      }}
+                      style={{
+                        background: '#262626',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        color: '#DBDBDB',
+                        padding: '6px 10px',
+                        borderRadius: '10px',
+                        cursor: 'pointer',
+                        fontSize: '11.5px',
+                        fontWeight: 600,
+                        outline: 'none'
+                      }}
+                    >
+                      <option value="">📅 Jump to Month...</option>
+                      {availableMonthYears.map((mStr, idx) => (
+                        <option key={idx} value={mStr} style={{ background: '#262626', color: '#FFF' }}>
+                          {mStr}
+                        </option>
+                      ))}
+                    </select>
                   )}
 
                   <button

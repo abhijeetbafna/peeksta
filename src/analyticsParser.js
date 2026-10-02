@@ -424,15 +424,21 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
   let photosMe = 0, photosPartner = 0;
   let audioMe = 0, audioPartner = 0;
 
+  const reactionsMeMap = new Map();
+  const reactionsPartnerMap = new Map();
+
+  let laughterMe = 0, laughterPartner = 0;
+
   for (let i = 0; i < messages.length; i++) {
     const msg = messages[i];
     const isMe = msg.sender === meName || (currentUserName && msg.sender.toLowerCase() === currentUserName.toLowerCase());
 
+    const formattedDate = msg.formattedDate || (msg.timestamp > 0 ? new Date(msg.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown');
+    const dateKey = formattedDate;
+
     if (msg.timestamp > 0) {
       const d = new Date(msg.timestamp);
       const hour = d.getHours();
-      const dateKey = d.toISOString().split('T')[0];
-      const formattedDate = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 
       if (!dateCountsMap.has(dateKey)) {
         dateCountsMap.set(dateKey, { count: 1, firstMsgId: msg.id, formattedDate });
@@ -454,10 +460,18 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
       }
     }
 
-    // Message Length Stats
+    // Message Length & Sentiment Stats
     if (msg.content && msg.content.trim()) {
       const charLen = msg.content.length;
       const wordCount = msg.content.trim().split(/\s+/).filter(Boolean).length;
+      const lower = msg.content.toLowerCase();
+
+      // Check laughter / high energy
+      const isLaughter = /haha|hahaha|lol|lmao|rofl|hehe/i.test(lower) || (msg.content.includes('!') && charLen > 10);
+      if (isLaughter) {
+        if (isMe) laughterMe++; else laughterPartner++;
+      }
+
       if (isMe) {
         totalCharsMe += charLen;
         totalWordsMe += wordCount;
@@ -479,6 +493,17 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
     if (msg.audioFiles && msg.audioFiles.length > 0) {
       if (isMe) audioMe += msg.audioFiles.length; else audioPartner += msg.audioFiles.length;
     }
+
+    // Track reactions by sender actor
+    if (Array.isArray(msg.reactions)) {
+      for (const r of msg.reactions) {
+        const actorName = r.actor || '';
+        const isMeActor = actorName === meName || (currentUserName && actorName.toLowerCase() === currentUserName.toLowerCase());
+        const emoji = r.reaction || '❤️';
+        const targetMap = isMeActor ? reactionsMeMap : reactionsPartnerMap;
+        targetMap.set(emoji, (targetMap.get(emoji) || 0) + 1);
+      }
+    }
   }
 
   // Peak calendar date
@@ -493,6 +518,10 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
       peakDateMsgId = item.firstMsgId;
     }
   }
+
+  // Top reactions
+  const topReactionsMe = Array.from(reactionsMeMap.entries()).sort((a, b) => b[1] - a[1]).slice(0, 4);
+  const topReactionsPartner = Array.from(reactionsPartnerMap.entries()).sort((a, b) => b[1] - a[1]).slice(0, 4);
 
   // Averages
   const avgCharsMe = textMsgsMe > 0 ? Math.round(totalCharsMe / textMsgsMe) : 0;
@@ -548,7 +577,11 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
     photosMe,
     photosPartner,
     audioMe,
-    audioPartner
+    audioPartner,
+    topReactionsMe,
+    topReactionsPartner,
+    laughterMe,
+    laughterPartner
   };
 }
 
