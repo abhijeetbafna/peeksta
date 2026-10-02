@@ -428,10 +428,17 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
   const reactionsPartnerMap = new Map();
 
   let laughterMe = 0, laughterPartner = 0;
+  let doubleTextingMe = 0, doubleTextingPartner = 0;
+  let questionsMe = 0, questionsPartner = 0;
 
   for (let i = 0; i < messages.length; i++) {
     const msg = messages[i];
     const isMe = msg.sender === meName || (currentUserName && msg.sender.toLowerCase() === currentUserName.toLowerCase());
+
+    if (i > 0 && messages[i - 1].sender === msg.sender) {
+      if (isMe) doubleTextingMe++;
+      else doubleTextingPartner++;
+    }
 
     const formattedDate = msg.formattedDate || (msg.timestamp > 0 ? new Date(msg.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Unknown');
     const dateKey = formattedDate;
@@ -465,6 +472,11 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
       const charLen = msg.content.length;
       const wordCount = msg.content.trim().split(/\s+/).filter(Boolean).length;
       const lower = msg.content.toLowerCase();
+
+      if (msg.content.includes('?')) {
+        if (isMe) questionsMe++;
+        else questionsPartner++;
+      }
 
       // Check laughter / high energy
       const isLaughter = /haha|hahaha|lol|lmao|rofl|hehe/i.test(lower) || (msg.content.includes('!') && charLen > 10);
@@ -581,7 +593,11 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
     topReactionsMe,
     topReactionsPartner,
     laughterMe,
-    laughterPartner
+    laughterPartner,
+    doubleTextingMe,
+    doubleTextingPartner,
+    questionsMe,
+    questionsPartner
   };
 }
 

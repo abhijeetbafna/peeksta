@@ -351,7 +351,13 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
     reelsMe,
     reelsPartner,
     photosMe,
-    photosPartner
+    photosPartner,
+    laughterMe = 0,
+    laughterPartner = 0,
+    doubleTextingMe = 0,
+    doubleTextingPartner = 0,
+    questionsMe = 0,
+    questionsPartner = 0
   } = analytics;
 
   const maxHourVal = Math.max(...hourlyCounts, 1);
@@ -912,6 +918,79 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
           ) : (
             <div style={{ fontSize: '12px', color: palette.textSecondary }}>No text keywords.</div>
           )}
+        </div>
+
+      </div>
+
+      {/* Grid Row 5: Interaction Vibe (Double Texting, Curiosity Score, Laughter) */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+        
+        {/* Double Texting Champion */}
+        <div style={{ background: palette.cardBg, border: `1px solid ${palette.border}`, borderRadius: '16px', padding: '20px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: palette.textPrimary, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>📲</span> Double Texting Frequency
+          </div>
+          <div style={{ fontSize: '12px', color: palette.textSecondary, marginBottom: '10px' }}>
+            Consecutive messages sent without waiting for a reply:
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', background: palette.cardInnerBg, padding: '8px 12px', borderRadius: '10px', marginBottom: '6px' }}>
+            <span style={{ color: '#E1306C', fontWeight: 700 }}>{meName}</span>
+            <span style={{ color: palette.textPrimary, fontWeight: 800 }}>{doubleTextingMe} times</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', background: palette.cardInnerBg, padding: '8px 12px', borderRadius: '10px' }}>
+            <span style={{ color: '#833AB4', fontWeight: 700 }}>{partnerName}</span>
+            <span style={{ color: palette.textPrimary, fontWeight: 800 }}>{doubleTextingPartner} times</span>
+          </div>
+          <div style={{ fontSize: '11px', color: palette.textSecondary, marginTop: '10px', textAlign: 'center', fontWeight: 600 }}>
+            {doubleTextingMe > doubleTextingPartner
+              ? `🏆 ${meName} double-texts more frequently!`
+              : doubleTextingPartner > doubleTextingMe
+              ? `🏆 ${partnerName} double-texts more frequently!`
+              : '⚖️ Equal double-texting ratio!'}
+          </div>
+        </div>
+
+        {/* Curiosity & Questions Asked */}
+        <div style={{ background: palette.cardBg, border: `1px solid ${palette.border}`, borderRadius: '16px', padding: '20px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: palette.textPrimary, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>❓</span> Curiosity & Questions Score
+          </div>
+          <div style={{ fontSize: '12px', color: palette.textSecondary, marginBottom: '10px' }}>
+            Total question messages sent:
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', background: palette.cardInnerBg, padding: '8px 12px', borderRadius: '10px', marginBottom: '6px' }}>
+            <span style={{ color: '#E1306C', fontWeight: 700 }}>{meName}</span>
+            <span style={{ color: palette.textPrimary, fontWeight: 800 }}>{questionsMe} questions</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', background: palette.cardInnerBg, padding: '8px 12px', borderRadius: '10px' }}>
+            <span style={{ color: '#833AB4', fontWeight: 700 }}>{partnerName}</span>
+            <span style={{ color: palette.textPrimary, fontWeight: 800 }}>{questionsPartner} questions</span>
+          </div>
+          <div style={{ fontSize: '11px', color: palette.textSecondary, marginTop: '10px', textAlign: 'center', fontWeight: 600 }}>
+            {questionsMe > questionsPartner
+              ? `🔍 ${meName} asks more questions & drives conversation.`
+              : questionsPartner > questionsMe
+              ? `🔍 ${partnerName} asks more questions & drives conversation.`
+              : '🤝 Balanced curiosity from both sides!'}
+          </div>
+        </div>
+
+        {/* Laughter & Humor Meter */}
+        <div style={{ background: palette.cardBg, border: `1px solid ${palette.border}`, borderRadius: '16px', padding: '20px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, color: palette.textPrimary, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>😂</span> Humor & Laughter Meter
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', background: palette.cardInnerBg, padding: '8px 12px', borderRadius: '10px', marginBottom: '8px' }}>
+            <span style={{ color: palette.textSecondary }}>{meName} Laughter Triggers</span>
+            <span style={{ color: '#E1306C', fontWeight: 800 }}>{laughterMe}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', background: palette.cardInnerBg, padding: '8px 12px', borderRadius: '10px', marginBottom: '10px' }}>
+            <span style={{ color: palette.textSecondary }}>{partnerName} Laughter Triggers</span>
+            <span style={{ color: '#833AB4', fontWeight: 800 }}>{laughterPartner}</span>
+          </div>
+          <div style={{ fontSize: '11px', color: palette.textSecondary, textAlign: 'center', fontWeight: 600 }}>
+            ✨ {laughterMe + laughterPartner} total laugh moments shared!
+          </div>
         </div>
 
       </div>
