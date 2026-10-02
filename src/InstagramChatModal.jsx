@@ -33,6 +33,10 @@ function getCleanHandle(nameStr) {
 export function UserAvatar({ username, title, size = 38, style = {}, isDark = true }) {
   const [imgError, setImgError] = useState(false);
   const handle = getCleanHandle(username || title);
+
+  useEffect(() => {
+    setImgError(false);
+  }, [handle]);
   
   const initials = (title || username || 'IG')
     .split(/[\s._]+/)
