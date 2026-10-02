@@ -812,6 +812,102 @@ export default function InstagramChatModal({
     }, 3500);
   };
 
+  // Export selected chat thread in HTML, TXT, or JSON format
+  const handleExportChat = (format = 'html') => {
+    if (!activeThread) return;
+    const title = activeThread.title || 'Instagram_Chat';
+    const filename = `${title.replace(/[\s/\\?%*:|"<>]+/g, '_')}_chat_archive.${format}`;
+
+    if (format === 'json') {
+      const jsonStr = JSON.stringify(activeThread, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    } else if (format === 'txt') {
+      let txtContent = `==================================================\n`;
+      txtContent += `PEEKSTA INSTAGRAM CHAT ARCHIVE\n`;
+      txtContent += `Thread: ${activeThread.title}\n`;
+      txtContent += `Participants: ${(activeThread.participants || []).join(', ')}\n`;
+      txtContent += `Total Messages: ${activeThread.messageCount}\n`;
+      txtContent += `Export Date: ${new Date().toLocaleDateString()}\n`;
+      txtContent += `==================================================\n\n`;
+
+      (activeThread.messages || []).forEach(m => {
+        txtContent += `[${m.formattedDate} ${m.formattedTime}] ${m.sender}:\n`;
+        if (m.content) txtContent += `${m.content}\n`;
+        if (m.photos?.length) txtContent += `[📷 Photo: ${m.photos.length} image(s)]\n`;
+        if (m.videos?.length) txtContent += `[🎥 Video: ${m.videos.length} video(s)]\n`;
+        if (m.audioFiles?.length) txtContent += `[🎵 Voice Note: ${m.audioFiles.length} file(s)]\n`;
+        if (m.share?.link) txtContent += `[🔗 Shared Link: ${m.share.link}]\n`;
+        if (m.reactions?.length) txtContent += `Reactions: ${m.reactions.map(r => `${r.actor} (${r.reaction})`).join(', ')}\n`;
+        txtContent += `\n`;
+      });
+
+      const blob = new Blob([txtContent], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    } else if (format === 'html') {
+      let html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Archive - ${activeThread.title}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0b0b0e; color: #f5f5f5; margin: 0; padding: 24px; }
+    .header { max-width: 720px; margin: 0 auto 24px auto; padding: 24px; background: #141414; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); }
+    .header h1 { margin: 0 0 6px 0; color: #E1306C; font-size: 22px; font-weight: 800; }
+    .header p { margin: 4px 0; color: #8e8e8e; font-size: 13px; }
+    .chat-container { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+    .msg { display: flex; flex-direction: column; max-width: 78%; padding: 10px 16px; border-radius: 18px; font-size: 13.5px; line-height: 1.45; word-break: break-word; }
+    .owner { align-self: flex-end; background: linear-gradient(135deg, #E1306C, #833AB4); color: #fff; border-bottom-right-radius: 4px; }
+    .other { align-self: flex-start; background: #262626; color: #fff; border-bottom-left-radius: 4px; }
+    .sender { font-size: 10.5px; font-weight: 700; opacity: 0.8; margin-bottom: 2px; }
+    .time { font-size: 9.5px; opacity: 0.6; margin-top: 4px; text-align: right; }
+    .badge { font-size: 11px; padding: 4px 8px; background: rgba(0,0,0,0.2); border-radius: 6px; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Peeksta DM Archive — ${activeThread.title}</h1>
+    <p><strong>Participants:</strong> ${(activeThread.participants || []).join(', ')}</p>
+    <p><strong>Total Messages:</strong> ${activeThread.messageCount} | <strong>Exported:</strong> ${new Date().toLocaleDateString()}</p>
+  </div>
+  <div class="chat-container">
+`;
+      const titleLower = (activeThread.title || '').toLowerCase().trim();
+      (activeThread.messages || []).forEach(m => {
+        const sLower = (m.sender || '').toLowerCase().trim();
+        const isMe = mySenderName ? sLower === mySenderName.toLowerCase().trim() : (sLower !== titleLower && !titleLower.includes(sLower));
+        html += `    <div class="msg ${isMe ? 'owner' : 'other'}">
+      <div class="sender">${m.sender}</div>
+      <div>${(m.content || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+      ${m.photos?.length ? `<div class="badge">📷 ${m.photos.length} Photo attachment(s)</div>` : ''}
+      ${m.videos?.length ? `<div class="badge">🎥 ${m.videos.length} Video attachment(s)</div>` : ''}
+      ${m.audioFiles?.length ? `<div class="badge">🎵 ${m.audioFiles.length} Voice Note(s)</div>` : ''}
+      ${m.share?.link ? `<div class="badge">🔗 <a href="${m.share.link}" target="_blank" style="color:inherit;">View Shared Instagram Reel</a></div>` : ''}
+      <div class="time">${m.formattedDate} ${m.formattedTime}</div>
+    </div>\n`;
+      });
+      html += `  </div>\n</body>\n</html>`;
+
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  };
+
   const audioRefs = useRef({});
   const chatMessagesEndRef = useRef(null);
 
@@ -1528,6 +1624,11 @@ export default function InstagramChatModal({
                 const validMsgs = (thread.messages || []).filter(m => !isSystemEvent(m.content));
                 const latestMsg = validMsgs.length > 0 ? validMsgs[validMsgs.length - 1] : (thread.messages?.[thread.messages.length - 1] || null);
 
+                const queryTrim = threadSearchQuery.toLowerCase().trim();
+                const matchCount = queryTrim
+                  ? (thread.messages || []).filter(m => (m.content || '').toLowerCase().includes(queryTrim)).length
+                  : 0;
+
                 return (
                   <div
                     key={thread.threadKey}
@@ -1601,6 +1702,20 @@ export default function InstagramChatModal({
                         >
                           {thread.messageCount} msgs
                         </span>
+                        {matchCount > 0 && (
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              background: 'rgba(225, 48, 108, 0.2)',
+                              color: '#E1306C',
+                              padding: '1px 6px',
+                              borderRadius: '8px'
+                            }}
+                          >
+                            🔍 {matchCount} match{matchCount > 1 ? 'es' : ''}
+                          </span>
+                        )}
                         {thread.photosCount > 0 && (
                           <span style={{ fontSize: '10px', color: '#E1306C', display: 'flex', alignItems: 'center', gap: '2px' }}>
                             <IconImage size={10} /> {thread.photosCount}
@@ -1681,7 +1796,7 @@ export default function InstagramChatModal({
                   </div>
                 </div>
 
-                {/* Right Actions: "I am", Search, Close */}
+                {/* Right Actions: "I am", Search, Export, Close */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
                   {activeSenders.length > 0 && (
                     <div
@@ -1747,6 +1862,33 @@ export default function InstagramChatModal({
                       ))}
                     </select>
                   )}
+
+                  {/* Export Chat Archive Selector */}
+                  <select
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        handleExportChat(e.target.value);
+                        e.target.value = '';
+                      }
+                    }}
+                    style={{
+                      background: colors.cardInnerBg,
+                      border: `1px solid ${colors.border}`,
+                      color: colors.textPrimary,
+                      padding: '6px 10px',
+                      borderRadius: '10px',
+                      cursor: 'pointer',
+                      fontSize: '11.5px',
+                      fontWeight: 600,
+                      outline: 'none'
+                    }}
+                    title="Export chat history as offline archive"
+                  >
+                    <option value="">📥 Export Chat...</option>
+                    <option value="html" style={{ background: colors.cardBg, color: colors.textPrimary }}>🌐 Web Archive (.html)</option>
+                    <option value="txt" style={{ background: colors.cardBg, color: colors.textPrimary }}>📄 Text File (.txt)</option>
+                    <option value="json" style={{ background: colors.cardBg, color: colors.textPrimary }}>💾 Raw Data (.json)</option>
+                  </select>
 
                   <button
                     onClick={() => setShowInChatSearch(!showInChatSearch)}
@@ -1991,6 +2133,73 @@ export default function InstagramChatModal({
                   background: colors.chatBg
                 }}
               >
+                {/* Media Vault Gallery Box when filtering Media, Reels or Audio */}
+                {filterType !== 'all' && filterType !== 'analytics' && messagesToDisplay.length > 0 && (
+                  <div
+                    style={{
+                      background: colors.cardBg,
+                      border: `1px solid ${colors.border}`,
+                      borderRadius: '16px',
+                      padding: '16px 20px',
+                      marginBottom: '10px'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                      <h4 style={{ fontSize: '14px', fontWeight: 700, color: colors.textPrimary, margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span>{filterType === 'audio' ? '🎵' : filterType === 'reels' ? '🎬' : '🖼️'}</span>
+                        {filterType === 'audio' ? 'Voice Notes Vault' : filterType === 'reels' ? 'Shared Reels Feed' : 'Media Gallery Vault'}
+                      </h4>
+                      <span style={{ fontSize: '11px', color: colors.textSecondary, fontWeight: 600 }}>
+                        {messagesToDisplay.length} item{messagesToDisplay.length > 1 ? 's' : ''}
+                      </span>
+                    </div>
+
+                    {filterType === 'audio' && (
+                      <div style={{ fontSize: '12px', color: colors.textSecondary }}>
+                        🎧 Playlist of {messagesToDisplay.length} voice note{messagesToDisplay.length > 1 ? 's' : ''} exchanged in this conversation. Use play controls on any bubble below.
+                      </div>
+                    )}
+
+                    {(filterType === 'media' || filterType === 'reels') && (
+                      <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
+                        {messagesToDisplay.slice(0, 15).map((m, mIdx) => {
+                          const photo = m.photos?.[0];
+                          const vid = m.videos?.[0];
+                          const uri = photo?.uri || vid?.uri;
+                          const blobUrl = uri ? mediaUrls[uri] : null;
+
+                          return (
+                            <div
+                              key={mIdx}
+                              onClick={() => blobUrl && setPreviewImage(blobUrl)}
+                              style={{
+                                width: '72px',
+                                height: '72px',
+                                borderRadius: '10px',
+                                background: colors.cardInnerBg,
+                                flexShrink: 0,
+                                overflow: 'hidden',
+                                cursor: blobUrl ? 'pointer' : 'default',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                border: `1px solid ${colors.border}`,
+                                position: 'relative'
+                              }}
+                            >
+                              {blobUrl ? (
+                                <img src={blobUrl} alt="Thumbnail preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              ) : (
+                                <span style={{ fontSize: '18px' }}>{filterType === 'reels' ? '🎬' : '📷'}</span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {filterType === 'analytics' ? (
                   <ThreadAnalyticsView
                     analytics={computeThreadAnalytics(activeThread, mySenderName)}
