@@ -83,6 +83,11 @@ const IcZap = ({ size = 18 }) => (
     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
   </svg>
 );
+const IcMessage = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+  </svg>
+);
 
 /* ── Feature card ── */
 function FeatureCard({ icon, title, desc, badge, delay }) {
@@ -125,7 +130,6 @@ function StepCard({ num, title, desc, delay }) {
 export default function LandingPage({ onEnter, onDemo }) {
   const [scrolled, setScrolled] = useState(false);
   const [heroVis, setHeroVis] = useState(false);
-  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 20);
@@ -138,27 +142,8 @@ export default function LandingPage({ onEnter, onDemo }) {
     return () => clearTimeout(t);
   }, []);
 
-  // "Get Started" / "Upload" → trigger file picker, then transition to app
-  const handleUploadClick = useCallback(() => {
-    if (fileInputRef.current) fileInputRef.current.click();
-  }, []);
-
-  const handleFileSelected = useCallback((e) => {
-    const file = e.target.files?.[0];
-    if (file) onEnter(file); // pass the file to parent so App can auto-process it
-  }, [onEnter]);
-
   return (
     <div className="lp-root">
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".zip,.json"
-        style={{ display: 'none' }}
-        onChange={handleFileSelected}
-      />
-
       {/* NAV */}
       <nav className={`lp-nav ${scrolled ? 'lp-nav-scrolled' : ''}`}>
         <div className="lp-nav-inner">
@@ -175,8 +160,8 @@ export default function LandingPage({ onEnter, onDemo }) {
           </div>
           <div className="lp-nav-ctas">
             <button className="lp-btn-ghost" onClick={onDemo}>Try Demo</button>
-            <button className="lp-btn-primary" id="lp-nav-upload-btn" onClick={handleUploadClick}>
-              <IcUpload size={13}/> Upload Archive <IcArrow size={12}/>
+            <button className="lp-btn-primary" id="lp-nav-upload-btn" onClick={() => onEnter()}>
+              Launch App <IcArrow size={12}/>
             </button>
           </div>
         </div>
@@ -189,31 +174,29 @@ export default function LandingPage({ onEnter, onDemo }) {
           <div className={`lp-hero-copy ${heroVis ? 'lp-visible' : ''}`}>
             <div className="lp-hero-badge">
               <span className="lp-hero-badge-dot"/>
-              <span>100% Private · Client-Side · No Account Needed</span>
+              <span>100% Private & Local</span>
             </div>
             <h1 className="lp-hero-headline">
-              Know exactly who<br/>
-              <span className="lp-gradient-text">follows you back.</span>
+              Instagram DMs &<br/>
+              <span className="lp-gradient-text">Unfollowers, Analyzed.</span>
             </h1>
             <p className="lp-hero-sub">
-              Upload your Instagram data export and instantly unlock ghost follower detection,
-              engagement analytics, audience segmentation, and time-travel comparisons —
-              entirely in your browser.
+              Explore your chat history, voice notes, shared reels, and non-followers — 100% privately inside your browser.
             </p>
             <div className="lp-hero-ctas">
-              <button className="lp-btn-hero-primary" id="lp-hero-upload-btn" onClick={handleUploadClick}>
-                <IcUpload size={17}/>
-                Upload My Archive
+              <button className="lp-btn-hero-primary" id="lp-hero-upload-btn" onClick={() => onEnter()}>
+                <IcArrow size={17}/>
+                Launch App
               </button>
               <button className="lp-btn-hero-ghost" id="lp-hero-demo-btn" onClick={onDemo}>
-                Try with Demo Data
+                Try Demo Mode
               </button>
             </div>
             <div className="lp-hero-social">
               <div className="lp-stars">
                 {[1,2,3,4,5].map(i => <IcStar key={i} size={13}/>)}
               </div>
-              <span className="lp-social-text">Loved by Instagram power users</span>
+              <span className="lp-social-text">No Login Required · Zero Server Uploads</span>
             </div>
           </div>
 
@@ -224,12 +207,12 @@ export default function LandingPage({ onEnter, onDemo }) {
                 <span className="lp-tb-dot lp-tb-red"/>
                 <span className="lp-tb-dot lp-tb-yellow"/>
                 <span className="lp-tb-dot lp-tb-green"/>
-                <span className="lp-tb-label">Peeksta · Dashboard</span>
+                <span className="lp-tb-label">Peeksta · Instagram Data Analyzer</span>
               </div>
               <div className="lp-preview-body">
                 <div className="lp-mock-sidebar">
                   <div className="lp-mock-brand-bar"/>
-                  {['Dashboard','Non-Followers','Mutuals','VIP List','Security'].map((l, i) => (
+                  {['Dashboard','Non-Followers','Mutuals','DMs & Messages','Security'].map((l, i) => (
                     <div key={i} className={`lp-mock-nav-item ${i === 0 ? 'active' : ''}`}>
                       <div className="lp-mock-nav-dot"/>{l}
                     </div>
@@ -240,8 +223,8 @@ export default function LandingPage({ onEnter, onDemo }) {
                     {[
                       { label: 'Following', val: '842', c: '#C13584' },
                       { label: 'Followers', val: '619', c: '#3B82F6' },
-                      { label: 'Non-Follow', val: '223', c: '#EF4444' },
-                      { label: 'Mutuals', val: '396', c: '#833AB4' },
+                      { label: 'Non-Followers', val: '223', c: '#EF4444' },
+                      { label: 'DM Messages', val: '1,420', c: '#833AB4' },
                     ].map((kpi, i) => (
                       <div key={i} className="lp-mock-kpi" style={{ borderTopColor: kpi.c }}>
                         <div className="lp-mock-kpi-val" style={{ color: kpi.c }}>{kpi.val}</div>
@@ -267,7 +250,7 @@ export default function LandingPage({ onEnter, onDemo }) {
                   <div className="lp-mock-list">
                     {[
                       { u: 'ghost_account_99', tag: 'Non-follower', c: '#EF4444', bg: '#FEF2F2' },
-                      { u: 'silent_watcher_x', tag: 'Non-follower', c: '#EF4444', bg: '#FEF2F2' },
+                      { u: 'alex_perez', tag: '1,420 msgs · DM Viewer', c: '#833AB4', bg: '#FDF0F8' },
                       { u: 'mutual_friend_01', tag: 'Mutual', c: '#C13584', bg: '#FDF0F8' },
                     ].map((row, i) => (
                       <div key={i} className="lp-mock-list-row">
@@ -288,10 +271,10 @@ export default function LandingPage({ onEnter, onDemo }) {
         {/* Stats bar */}
         <div className={`lp-stats-bar ${heroVis ? 'lp-visible' : ''}`} style={{ transitionDelay: '300ms' }}>
           {[
-            { v: '6+', l: 'Analytics Modules' },
-            { v: '100%', l: 'Client-Side' },
-            { v: 'ZIP', l: 'Full Archive Support' },
-            { v: '0', l: 'Data Sent to Server' },
+            { v: '100%', l: 'Browser Privacy' },
+            { v: 'DM Viewer', l: 'Chats, Audio & Reels' },
+            { v: 'Non-Followers', l: 'Track Unfollowers' },
+            { v: '0 Server Uploads', l: 'Runs Entirely Locally' },
           ].map((s, i) => (
             <div key={i} className="lp-stat-block">
               {i > 0 && <div className="lp-stat-divider"/>}
@@ -306,21 +289,21 @@ export default function LandingPage({ onEnter, onDemo }) {
       <section className="lp-section lp-section-alt" id="features">
         <div className="lp-section-inner">
           <div className="lp-section-header">
-            <div className="lp-section-eyebrow">Everything you need</div>
+            <div className="lp-section-eyebrow">Features</div>
             <h2 className="lp-section-headline">
-              Powerful analytics, <span className="lp-gradient-text">zero compromise.</span>
+              Private Instagram <span className="lp-gradient-text">Insights.</span>
             </h2>
             <p className="lp-section-sub">
-              Six deeply integrated modules that turn your Instagram export into actionable intelligence.
+              Everything runs locally on your device without passwords or server uploads.
             </p>
           </div>
           <div className="lp-features-grid">
-            <FeatureCard delay={0}   icon={<IcUsers size={19}/>}    title="Ghost Follower Detection"  desc="Instantly surface accounts you follow that don't follow you back. Filter, sort, and bulk-review with one click." badge="Core"/>
-            <FeatureCard delay={60}  icon={<IcBarChart size={19}/>} title="Engagement Intelligence"   desc="Analyse DM threads, liked posts, and interaction density to rank your most engaged audience segments."/>
-            <FeatureCard delay={120} icon={<IcClock size={19}/>}    title="Time-Machine Snapshots"    desc="Save follower states and compare across time. Track exactly who unfollowed you between exports." badge="Unique"/>
-            <FeatureCard delay={180} icon={<IcShield size={19}/>}   title="Security Scorecard"        desc="Review 2FA, autofill exposure, synced contacts, and restricted profiles in a unified audit view."/>
-            <FeatureCard delay={240} icon={<IcZap size={19}/>}      title="Fast Review Queue"         desc="Speed-card UI to accept or dismiss non-followers rapidly — like a swipe interface for your following list." badge="Fast"/>
-            <FeatureCard delay={300} icon={<IcLock size={19}/>}     title="100% Private by Design"    desc="All parsing happens locally in your browser. No login, no API calls, no data ever leaves your device."/>
+            <FeatureCard delay={0}   icon={<IcUsers size={19}/>}    title="Non-Followers"  desc="See who you follow that doesn't follow you back." badge="Popular"/>
+            <FeatureCard delay={60}  icon={<IcMessage size={19}/>} title="DM Chat Viewer" desc="Read chat history, listen to voice notes & view shared reels." badge="New"/>
+            <FeatureCard delay={120} icon={<IcBarChart size={19}/>} title="Chat Insights" desc="Track peak messaging hours, reply speeds, and top emojis."/>
+            <FeatureCard delay={180} icon={<IcClock size={19}/>}    title="Unfollower Snapshots" desc="Save follower lists to track unfollowers over time." badge="Snapshot"/>
+            <FeatureCard delay={240} icon={<IcShield size={19}/>}   title="Privacy Audit" desc="Review 2FA status and synced phonebook contacts."/>
+            <FeatureCard delay={300} icon={<IcLock size={19}/>}     title="100% Private" desc="Your data is parsed locally and never leaves your browser."/>
           </div>
         </div>
       </section>
@@ -329,19 +312,19 @@ export default function LandingPage({ onEnter, onDemo }) {
       <section className="lp-section" id="how">
         <div className="lp-section-inner">
           <div className="lp-section-header">
-            <div className="lp-section-eyebrow">Simple 3-step process</div>
+            <div className="lp-section-eyebrow">How It Works</div>
             <h2 className="lp-section-headline">
-              From export to insights <span className="lp-gradient-text">in seconds.</span>
+              3 Simple <span className="lp-gradient-text">Steps.</span>
             </h2>
           </div>
           <div className="lp-steps-grid">
-            <StepCard num="01" title="Export from Instagram" desc="Go to Instagram Settings → Accounts Center → Your Information & Permissions → Download your information. Choose JSON format." delay={0}/>
-            <StepCard num="02" title="Upload your ZIP"       desc="Drop your downloaded ZIP archive into Peeksta. It reads and parses all connection files instantly, right in your browser." delay={100}/>
-            <StepCard num="03" title="Explore your data"    desc="Navigate your dashboard: non-followers, mutual friends, engagement scores, time-machine comparisons, security audit — all live." delay={200}/>
+            <StepCard num="01" title="Download Data" desc="Request your JSON data export from Instagram Settings." delay={0}/>
+            <StepCard num="02" title="Upload ZIP" desc="Drop your downloaded ZIP file directly into Peeksta." delay={100}/>
+            <StepCard num="03" title="Explore Insights" desc="Browse chat history, voice notes, and non-followers." delay={200}/>
           </div>
           <div className="lp-how-cta">
-            <button className="lp-btn-hero-primary" onClick={handleUploadClick}><IcUpload size={16}/> Upload My Archive</button>
-            <button className="lp-btn-hero-ghost" onClick={onDemo}>Explore with Demo</button>
+            <button className="lp-btn-hero-primary" onClick={() => onEnter()}><IcArrow size={16}/> Launch App</button>
+            <button className="lp-btn-hero-ghost" onClick={onDemo}>Explore Demo</button>
           </div>
         </div>
       </section>
@@ -353,10 +336,10 @@ export default function LandingPage({ onEnter, onDemo }) {
             <div className="lp-privacy-icon"><IcLock size={24}/></div>
             <div className="lp-privacy-text">
               <h3>Your data never leaves your device</h3>
-              <p>Peeksta runs entirely in your browser using the Web File API. No account needed, no analytics tracking, no network calls with your personal data.</p>
+              <p>Peeksta processes your data 100% inside your browser. No logins, no passwords, and zero server uploads.</p>
             </div>
             <div className="lp-privacy-checks">
-              {['No login required','No data upload','No server storage','Open source on GitHub'].map(c => (
+              {['No login required','No server uploads','100% client-side privacy','Free & open source'].map(c => (
                 <div key={c} className="lp-privacy-check">
                   <span className="lp-check-icon"><IcCheck size={12}/></span>{c}
                 </div>
@@ -372,14 +355,14 @@ export default function LandingPage({ onEnter, onDemo }) {
         <div className="lp-final-orb lp-final-orb-r"/>
         <div className="lp-section-inner" style={{ position: 'relative', zIndex: 1 }}>
           <div className="lp-hero-badge" style={{ justifyContent: 'center' }}>
-            <span className="lp-hero-badge-dot"/><span>Free forever · No sign-up</span>
+            <span className="lp-hero-badge-dot"/><span>100% Free · No Sign-Up</span>
           </div>
           <h2 className="lp-final-headline">
-            Ready to see the truth<br/>about your Instagram network?
+            Ready to Explore Your Data?
           </h2>
           <div className="lp-hero-ctas" style={{ justifyContent: 'center' }}>
-            <button className="lp-btn-hero-primary" onClick={handleUploadClick}><IcUpload size={17}/> Upload My Archive</button>
-            <button className="lp-btn-hero-ghost" onClick={onDemo}>Try with Demo Data</button>
+            <button className="lp-btn-hero-primary" onClick={() => onEnter()}><IcArrow size={17}/> Launch App</button>
+            <button className="lp-btn-hero-ghost" onClick={onDemo}>Try Demo Mode</button>
           </div>
         </div>
       </section>
@@ -394,7 +377,7 @@ export default function LandingPage({ onEnter, onDemo }) {
           <div className="lp-footer-links">
             <a href="https://github.com/abhijeetbafna/instalens" target="_blank" rel="noreferrer" className="lp-footer-link"><IcGithub size={14}/> GitHub</a>
             <button className="lp-footer-link-btn" onClick={onDemo}>Demo</button>
-            <button className="lp-footer-link-btn" onClick={handleUploadClick}>Launch App</button>
+            <button className="lp-footer-link-btn" onClick={() => onEnter()}>Launch App</button>
           </div>
           <p className="lp-footer-copy">© 2024 Peeksta · Client-side only · No data collected</p>
         </div>

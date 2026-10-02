@@ -6,7 +6,8 @@ import EngagementHubModal from './EngagementHubModal';
 import SecurityScorecardModal from './SecurityScorecardModal';
 import FastReviewQueueModal from './FastReviewQueueModal';
 import { getWhitelist, saveWhitelist, saveSnapshot } from './snapshotStorage';
-import { parseMessageThread, parseLikedPosts, computeSecurityHealth } from './analyticsParser';
+import { parseMessageThread, parseLikedPosts, computeSecurityHealth, mergeThreadsList } from './analyticsParser';
+import InstagramChatModal from './InstagramChatModal';
 import {
   IconDashboard,
   IconUserMinus,
@@ -435,6 +436,9 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
   const [likedAccounts, setLikedAccounts] = useState([]);
   const [whitelist, setWhitelist] = useState(() => getWhitelist());
   const [filterOutWhitelisted, setFilterOutWhitelisted] = useState(false);
+  const [zipFileRef, setZipFileRef] = useState(null);
+  const [showChatModal, setShowChatModal] = useState(false);
+  const [selectedChatThreadKey, setSelectedChatThreadKey] = useState(null);
 
   // Onboarding modes
   const [uploadMode, setUploadMode] = useState('smart');
@@ -476,10 +480,93 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
       synced_contacts: { name: 'synced_contacts', type: 'contacts', items: [{ name: 'Alex Perez', contactInfo: '+1 555-0192' }, { name: 'David Kim', contactInfo: '+1 555-0843' }] },
       two_factor_authentication: { name: 'two_factor_authentication', type: 'info', items: [{ label: 'Two-Factor Authentication', value: 'Configured with SMS Verification' }] }
     });
+    const demoMessagesAlex = [
+      {
+        id: 'demo_1',
+        sender: 'Alex Perez',
+        timestamp: Date.now() - 86400000 * 2,
+        formattedTime: '10:14 AM',
+        formattedDate: 'Sep 29, 2026',
+        content: 'Hey! Loved your latest post on the redesign launch 🚀',
+        reactions: [{ reaction: '❤️', actor: 'You' }]
+      },
+      {
+        id: 'demo_2',
+        sender: 'You',
+        timestamp: Date.now() - 86400000 * 2 + 120000,
+        formattedTime: '10:16 AM',
+        formattedDate: 'Sep 29, 2026',
+        content: 'Thank you so much Alex! Appreciate the support!',
+        reactions: []
+      },
+      {
+        id: 'demo_3',
+        sender: 'Alex Perez',
+        timestamp: Date.now() - 86400000 + 3600000,
+        formattedTime: '2:30 PM',
+        formattedDate: 'Sep 30, 2026',
+        content: 'Sent you a voice note with feedback on the bento layout 🎙️',
+        audioFiles: [{ uri: 'demo_voice_note.mp4' }],
+        reactions: [{ reaction: '👍', actor: 'You' }]
+      },
+      {
+        id: 'demo_4',
+        sender: 'You',
+        timestamp: Date.now() - 3600000 * 4,
+        formattedTime: '3:05 PM',
+        formattedDate: 'Oct 1, 2026',
+        content: 'Got it! Listening to it now, thanks for the detailed notes.',
+        reactions: [{ reaction: '❤️', actor: 'Alex Perez' }]
+      }
+    ];
+
+    const demoMessagesSarah = [
+      {
+        id: 's_1',
+        sender: 'Sarah Adams',
+        timestamp: Date.now() - 86400000 * 3,
+        formattedTime: '6:20 PM',
+        formattedDate: 'Sep 28, 2026',
+        content: 'Are we still meeting for coffee tomorrow?',
+        reactions: []
+      },
+      {
+        id: 's_2',
+        sender: 'You',
+        timestamp: Date.now() - 86400000 * 3 + 300000,
+        formattedTime: '6:25 PM',
+        formattedDate: 'Sep 28, 2026',
+        content: 'Yes! 10 AM at the usual spot ☕',
+        reactions: [{ reaction: '🙌', actor: 'Sarah Adams' }]
+      }
+    ];
+
+    const demoMessagesCommunity = [
+      {
+        id: 'c_1',
+        sender: 'David Kim',
+        timestamp: Date.now() - 86400000 * 5,
+        formattedTime: '11:00 AM',
+        formattedDate: 'Sep 26, 2026',
+        content: 'Welcome everyone to the Design Community group chat!',
+        reactions: [{ reaction: '🎉', actor: 'Emily Rose' }]
+      },
+      {
+        id: 'c_2',
+        sender: 'Emily Rose',
+        timestamp: Date.now() - 86400000 * 5 + 600000,
+        formattedTime: '11:10 AM',
+        formattedDate: 'Sep 26, 2026',
+        content: 'Excited to be here! Check out this link: https://dribbble.com',
+        share: { link: 'https://dribbble.com', shareText: 'Design inspiration on Dribbble' },
+        reactions: [{ reaction: '❤️', actor: 'David Kim' }]
+      }
+    ];
+
     setDmThreads([
-      { threadKey: '1', title: 'Alex Perez', participants: ['alexperez'], messageCount: 1420, latestDate: 'Yesterday' },
-      { threadKey: '2', title: 'Sarah Adams', participants: ['sarah_adams'], messageCount: 680, latestDate: '3 days ago' },
-      { threadKey: '3', title: 'Design Community', participants: ['david_kim', 'emilyrose'], messageCount: 412, latestDate: 'Last week' }
+      { threadKey: '1', title: 'Alex Perez', participants: ['alexperez', 'You'], messages: demoMessagesAlex, messageCount: 1420, photosCount: 12, videosCount: 2, audioCount: 5, reactionsCount: 18, latestDate: 'Yesterday' },
+      { threadKey: '2', title: 'Sarah Adams', participants: ['sarah_adams', 'You'], messages: demoMessagesSarah, messageCount: 680, photosCount: 4, videosCount: 1, audioCount: 2, reactionsCount: 9, latestDate: '3 days ago' },
+      { threadKey: '3', title: 'Design Community', participants: ['david_kim', 'emilyrose', 'You'], messages: demoMessagesCommunity, messageCount: 412, photosCount: 24, videosCount: 6, audioCount: 8, reactionsCount: 32, latestDate: 'Last week' }
     ]);
     setLikedAccounts([
       { username: 'natgeo', count: 184 },
@@ -662,18 +749,23 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
       }
 
       if (extractedDMs.length > 0) {
-        extractedDMs.sort((a, b) => b.messageCount - a.messageCount);
-        setDmThreads(extractedDMs);
+        const mergedDMs = mergeThreadsList(extractedDMs);
+        setDmThreads((prev) => mergeThreadsList([...prev, ...mergedDMs]));
+        setZipFileRef(loadedZip);
+        showToast(`Loaded ${mergedDMs.length} DM conversations!`);
+        setShowChatModal(true);
       }
       if (extractedLikes.length > 0) {
         setLikedAccounts(extractedLikes);
       }
 
-      if (Object.keys(newSets).length === 0) {
-        alert("No valid Instagram connection files found in this ZIP archive.");
-      } else {
-        setDataSets(newSets);
+      if (Object.keys(newSets).length > 0) {
+        setDataSets((prev) => ({ ...prev, ...newSets }));
         showToast(`Loaded ${Object.keys(newSets).length} connection lists!`);
+      }
+
+      if (Object.keys(newSets).length === 0 && extractedDMs.length === 0 && extractedLikes.length === 0) {
+        alert("No valid Instagram connection or message files found in this ZIP archive. Make sure you select JSON format when downloading your export from Instagram.");
       }
     } catch (err) {
       console.error(err);
@@ -688,8 +780,7 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
     setLoading(true);
-    const newSets = { ...dataSets };
-
+    const extractedDMs = [];
     for (const file of files) {
       if (file.name.toLowerCase().endsWith('.json')) {
         const text = await file.text();
@@ -697,8 +788,8 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
 
         if (lower.includes('inbox') || lower.includes('message')) {
           const thread = parseMessageThread(text, file.name);
-          if (thread) {
-            setDmThreads((prev) => [thread, ...prev].sort((a, b) => b.messageCount - a.messageCount));
+          if (thread && thread.messageCount > 0) {
+            extractedDMs.push(thread);
           }
         }
         if (lower.includes('liked_posts') || lower.includes('likes_media')) {
@@ -713,9 +804,18 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
       }
     }
 
-    setDataSets(newSets);
+    if (extractedDMs.length > 0) {
+      setDmThreads((prev) => mergeThreadsList([...prev, ...extractedDMs]));
+      showToast(`Loaded ${extractedDMs.length} DM conversations!`);
+      setShowChatModal(true);
+    }
+
+    if (Object.keys(newSets).length > 0) {
+      setDataSets((prev) => ({ ...prev, ...newSets }));
+      showToast(`Loaded ${Object.keys(newSets).length} connection files!`);
+    }
+
     setLoading(false);
-    showToast(`Loaded ${Object.keys(newSets).length} connection files!`);
   };
 
   // 3. Slot Uploads
@@ -1216,8 +1316,11 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
           </button>
 
           <button
-            className="nav-item-btn"
-            onClick={() => { setShowEngagementHub(true); setSidebarOpen(false); }}
+            className={`nav-item-btn ${activeTab === 'dms' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('dms');
+              setSidebarOpen(false);
+            }}
           >
             <div className="nav-item-content">
               <span className="nav-item-icon"><IconMessage size={15} /></span>
@@ -1430,20 +1533,120 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
         </header>
 
         {/* Dynamic Body Content */}
-        {activeTab === 'upload' || (!hasData && activeTab !== 'overview') ? (
+        {activeTab === 'dms' ? (
+          <InstagramChatModal
+            isOpen={true}
+            isInline={true}
+            onClose={() => setActiveTab('overview')}
+            threads={dmThreads}
+            initialThreadKey={selectedChatThreadKey}
+            zipFileRef={zipFileRef}
+            onUploadDMs={(newDMs, newZipRef) => {
+              setDmThreads((prev) => mergeThreadsList([...prev, ...newDMs]));
+              if (newZipRef) setZipFileRef(newZipRef);
+              showToast(`Loaded ${newDMs.length} DM conversations!`);
+            }}
+          />
+        ) : activeTab === 'upload' || (!hasData && activeTab !== 'overview') ? (
           /* VIEW: UPLOAD & ONBOARDING */
-          <div className="bento-card onboarding-bento-card">
-            <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'var(--bento-accent-soft)', color: 'var(--bento-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto' }}>
-              <IconUpload size={28} />
+          <div className="bento-card onboarding-bento-card" style={{ maxWidth: '960px', margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'var(--bento-accent-soft)', color: 'var(--bento-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto' }}>
+                <IconUpload size={28} />
+              </div>
+              <h2 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--bento-text-main)' }}>
+                Import Instagram Archives
+              </h2>
+              <p style={{ fontSize: '13px', color: 'var(--bento-text-muted)', marginTop: '4px' }}>
+                Upload your Instagram ZIP packages separately or together. You can upload Followers data and DM Messages data independently!
+              </p>
             </div>
-            <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--bento-text-main)' }}>
-              Import Instagram Export Archive
-            </h2>
-            <p style={{ fontSize: '13px', color: 'var(--bento-text-muted)', marginTop: '4px' }}>
-              Drag & drop your Instagram ZIP or JSON connection files to uncover who unfollowed you.
-            </p>
 
-            {/* Dropzone */}
+            {/* Dual Upload Cards Layout */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+              {/* Card 1: Followers & Connection Data */}
+              <div
+                style={{
+                  padding: '24px',
+                  borderRadius: 'var(--bento-radius-lg)',
+                  background: 'var(--bento-card-subtle)',
+                  border: '1px solid var(--bento-border)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  textAlign: 'center'
+                }}
+              >
+                <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'var(--bento-accent-soft)', color: 'var(--bento-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+                  <IconUsers size={20} />
+                </div>
+                <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--bento-text-main)', marginBottom: '4px' }}>
+                  1. Followers & Connection Export
+                </h3>
+                <p style={{ fontSize: '12px', color: 'var(--bento-text-muted)', marginBottom: '16px', minHeight: '36px' }}>
+                  Upload <code>followers_and_following.zip</code> or individual <code>followers_1.json</code> & <code>following.json</code> files.
+                </p>
+                <button
+                  className="bento-btn bento-btn-primary"
+                  style={{ width: '100%' }}
+                  onClick={() => document.getElementById('followers-upload-input')?.click()}
+                >
+                  <IconUpload size={14} />
+                  Select Followers Archive
+                </button>
+                <input
+                  id="followers-upload-input"
+                  type="file"
+                  accept=".zip,.json"
+                  multiple
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file?.name.toLowerCase().endsWith('.zip')) {
+                      handleZipUpload(e);
+                    } else {
+                      handleMultiUpload(e);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Card 2: DM Direct Messages */}
+              <div
+                style={{
+                  padding: '24px',
+                  borderRadius: 'var(--bento-radius-lg)',
+                  background: 'var(--bento-purple-soft)',
+                  border: '1px solid var(--bento-purple-border)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  textAlign: 'center'
+                }}
+              >
+                <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'linear-gradient(135deg, #C13584, #833AB4)', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+                  <IconMessage size={20} />
+                </div>
+                <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--bento-text-main)', marginBottom: '4px' }}>
+                  2. Messages & DM Archive
+                </h3>
+                <p style={{ fontSize: '12px', color: 'var(--bento-text-muted)', marginBottom: '16px', minHeight: '36px' }}>
+                  Upload Instagram <code>messages.zip</code> or DM JSON files to view full chat history, audio notes, and search.
+                </p>
+                <button
+                  className="bento-btn bento-btn-primary"
+                  style={{ width: '100%', background: 'linear-gradient(135deg, #C13584, #833AB4)' }}
+                  onClick={() => {
+                    setActiveTab('dms');
+                  }}
+                >
+                  <IconMessage size={14} />
+                  Open DM Upload & Viewer
+                </button>
+              </div>
+            </div>
+
+            {/* Universal Dropzone */}
             <div
               className={`bento-dropzone ${isDragging ? 'dragging' : ''}`}
               onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
@@ -1466,15 +1669,16 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
                 <IconUpload size={32} />
               </div>
               <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--bento-text-main)' }}>
-                Click to upload or drag & drop ZIP / JSON
+                Universal Dropzone: Drag & Drop any ZIP or JSON file here
               </div>
               <div style={{ fontSize: '12px', color: 'var(--bento-text-muted)', marginTop: '3px' }}>
-                Supports full export ZIP or individual <code>followers_1.json</code> & <code>following.json</code>
+                Supports combined or separate Followers & Messages archives
               </div>
               <input
                 id="bento-file-input"
                 type="file"
                 accept=".zip,.json"
+                multiple
                 style={{ display: 'none' }}
                 onChange={(e) => {
                   const file = e.target.files?.[0];
@@ -1487,16 +1691,10 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
               />
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '16px' }}>
               <button className="bento-btn bento-btn-primary" onClick={loadDemoData}>
                 <IconZap size={14} />
                 Load Sample Demo Data Immediately
-              </button>
-              <button
-                className="bento-btn bento-btn-secondary"
-                onClick={() => alert("To export from Instagram:\n1. Open Instagram Settings -> Accounts Center -> Your Information and Permissions.\n2. Tap 'Download your information'.\n3. Select 'JSON' format and 'All time'.")}
-              >
-                Export Guide
               </button>
             </div>
           </div>
@@ -1816,19 +2014,40 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
                       <IconMessage size={16} />
                       <span>Top Direct Conversations</span>
                     </div>
-                    <button
-                      className="bento-btn bento-btn-secondary bento-btn-sm"
-                      onClick={() => setShowEngagementHub(true)}
-                    >
-                      Studio
-                      <IconArrowUpRight size={10} />
-                    </button>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      {dmThreads.length > 0 && (
+                        <button
+                          className="bento-btn bento-btn-primary bento-btn-sm"
+                          onClick={() => {
+                            setSelectedChatThreadKey(dmThreads[0]?.threadKey);
+                            setActiveTab('dms');
+                          }}
+                        >
+                          View Chats
+                        </button>
+                      )}
+                      <button
+                        className="bento-btn bento-btn-secondary bento-btn-sm"
+                        onClick={() => setShowEngagementHub(true)}
+                      >
+                        Studio
+                        <IconArrowUpRight size={10} />
+                      </button>
+                    </div>
                   </div>
 
                   {dmThreads.length > 0 ? (
                     <div>
                       {dmThreads.slice(0, 3).map((t, idx) => (
-                        <div key={idx} className="dm-thread-item">
+                        <div
+                          key={idx}
+                          className="dm-thread-item"
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => {
+                            setSelectedChatThreadKey(t.threadKey);
+                            setActiveTab('dms');
+                          }}
+                        >
                           <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--bento-text-main)' }}>
                             {t.title}
                           </span>
@@ -1999,6 +2218,23 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
         mutuals={insights.mutuals}
         whitelist={whitelist}
         toggleWhitelist={toggleWhitelist}
+        onOpenChat={(threadKey) => {
+          setSelectedChatThreadKey(threadKey);
+          setShowChatModal(true);
+        }}
+      />
+
+      <InstagramChatModal
+        isOpen={showChatModal}
+        onClose={() => setShowChatModal(false)}
+        threads={dmThreads}
+        initialThreadKey={selectedChatThreadKey}
+        zipFileRef={zipFileRef}
+        onUploadDMs={(newDMs, newZipRef) => {
+          setDmThreads((prev) => mergeThreadsList([...prev, ...newDMs]));
+          if (newZipRef) setZipFileRef(newZipRef);
+          showToast(`Loaded ${newDMs.length} DM conversations!`);
+        }}
       />
 
       <SecurityScorecardModal

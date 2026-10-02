@@ -16,7 +16,8 @@ export default function EngagementHubModal({
   likedAccounts = [],
   mutuals = [],
   whitelist,
-  toggleWhitelist
+  toggleWhitelist,
+  onOpenChat
 }) {
   const [activeTab, setActiveTab] = useState('dms'); // 'dms' | 'liked' | 'silent'
 
@@ -86,7 +87,15 @@ export default function EngagementHubModal({
               {dmThreads.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {dmThreads.map((thread, idx) => (
-                    <div key={`${thread.threadKey}-${idx}`} className="bento-user-row">
+                    <div
+                      key={`${thread.threadKey}-${idx}`}
+                      className="bento-user-row"
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => {
+                        onClose();
+                        if (onOpenChat) onOpenChat(thread.threadKey);
+                      }}
+                    >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
                         <div
                           style={{
@@ -115,10 +124,21 @@ export default function EngagementHubModal({
                         </div>
                       </div>
 
-                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <span className="nav-counter-pill alert-green" style={{ fontSize: '11px', padding: '3px 8px' }}>
                           {thread.messageCount.toLocaleString()} msgs
                         </span>
+                        <button
+                          className="bento-btn bento-btn-secondary bento-btn-sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onClose();
+                            if (onOpenChat) onOpenChat(thread.threadKey);
+                          }}
+                        >
+                          View Chat
+                          <IconArrowUpRight size={10} />
+                        </button>
                       </div>
                     </div>
                   ))}
