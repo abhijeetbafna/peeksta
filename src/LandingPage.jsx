@@ -178,10 +178,10 @@ export default function LandingPage({ onEnter, onDemo }) {
             </div>
             <h1 className="lp-hero-headline">
               Instagram DMs &<br/>
-              <span className="lp-gradient-text">Unfollowers, Analyzed.</span>
+              <span className="lp-gradient-text">Conversations, Visualized.</span>
             </h1>
             <p className="lp-hero-sub">
-              Explore your chat history, voice notes, shared reels, and non-followers — 100% privately inside your browser.
+              Explore your full DM history, voice notes, shared reels, and network connection dynamics — 100% privately inside your browser.
             </p>
             <div className="lp-hero-ctas">
               <button className="lp-btn-hero-primary" id="lp-hero-upload-btn" onClick={() => onEnter()}>
@@ -212,7 +212,7 @@ export default function LandingPage({ onEnter, onDemo }) {
               <div className="lp-preview-body">
                 <div className="lp-mock-sidebar">
                   <div className="lp-mock-brand-bar"/>
-                  {['Dashboard','Non-Followers','Mutuals','DMs & Messages','Security'].map((l, i) => (
+                  {['Dashboard','Audience Reciprocity','Mutual Friends','DMs & Messages','Security'].map((l, i) => (
                     <div key={i} className={`lp-mock-nav-item ${i === 0 ? 'active' : ''}`}>
                       <div className="lp-mock-nav-dot"/>{l}
                     </div>
@@ -223,7 +223,7 @@ export default function LandingPage({ onEnter, onDemo }) {
                     {[
                       { label: 'Following', val: '842', c: '#C13584' },
                       { label: 'Followers', val: '619', c: '#3B82F6' },
-                      { label: 'Non-Followers', val: '223', c: '#EF4444' },
+                      { label: 'Pending Reciprocity', val: '223', c: '#E1306C' },
                       { label: 'DM Messages', val: '1,420', c: '#833AB4' },
                     ].map((kpi, i) => (
                       <div key={i} className="lp-mock-kpi" style={{ borderTopColor: kpi.c }}>
@@ -237,7 +237,7 @@ export default function LandingPage({ onEnter, onDemo }) {
                       <circle cx="40" cy="40" r="28" fill="none" stroke="#F4F5F7" strokeWidth="13"/>
                       <circle cx="40" cy="40" r="28" fill="none" stroke="#C13584" strokeWidth="13" strokeDasharray="70 106" strokeDashoffset="0" strokeLinecap="round"/>
                       <circle cx="40" cy="40" r="28" fill="none" stroke="#3B82F6" strokeWidth="13" strokeDasharray="46 130" strokeDashoffset="-70" strokeLinecap="round"/>
-                      <circle cx="40" cy="40" r="28" fill="none" stroke="#EF4444" strokeWidth="13" strokeDasharray="28 148" strokeDashoffset="-116" strokeLinecap="round"/>
+                      <circle cx="40" cy="40" r="28" fill="none" stroke="#E1306C" strokeWidth="13" strokeDasharray="28 148" strokeDashoffset="-116" strokeLinecap="round"/>
                     </svg>
                     <div className="lp-mock-bars">
                       {[72,45,85,60,55,78,40].map((h, i) => (
@@ -249,7 +249,7 @@ export default function LandingPage({ onEnter, onDemo }) {
                   </div>
                   <div className="lp-mock-list">
                     {[
-                      { u: 'ghost_account_99', tag: 'Non-follower', c: '#EF4444', bg: '#FEF2F2' },
+                      { u: 'creative_studio', tag: 'Network Gap', c: '#E1306C', bg: '#FDF0F8' },
                       { u: 'alex_perez', tag: '1,420 msgs · DM Viewer', c: '#833AB4', bg: '#FDF0F8' },
                       { u: 'mutual_friend_01', tag: 'Mutual', c: '#C13584', bg: '#FDF0F8' },
                     ].map((row, i) => (
@@ -273,7 +273,7 @@ export default function LandingPage({ onEnter, onDemo }) {
           {[
             { v: '100%', l: 'Browser Privacy' },
             { v: 'DM Viewer', l: 'Chats, Audio & Reels' },
-            { v: 'Non-Followers', l: 'Track Unfollowers' },
+            { v: 'Network Insights', l: 'Relationship Reciprocity' },
             { v: '0 Server Uploads', l: 'Runs Entirely Locally' },
           ].map((s, i) => (
             <div key={i} className="lp-stat-block">
@@ -298,10 +298,10 @@ export default function LandingPage({ onEnter, onDemo }) {
             </p>
           </div>
           <div className="lp-features-grid">
-            <FeatureCard delay={0}   icon={<IcUsers size={19}/>}    title="Non-Followers"  desc="See who you follow that doesn't follow you back." badge="Popular"/>
+            <FeatureCard delay={0}   icon={<IcUsers size={19}/>}    title="Audience Reciprocity"  desc="Analyze connection balance across your following & follower lists." badge="Popular"/>
             <FeatureCard delay={60}  icon={<IcMessage size={19}/>} title="DM Chat Viewer" desc="Read chat history, listen to voice notes & view shared reels." badge="New"/>
             <FeatureCard delay={120} icon={<IcBarChart size={19}/>} title="Chat Insights" desc="Track peak messaging hours, reply speeds, and top emojis."/>
-            <FeatureCard delay={180} icon={<IcClock size={19}/>}    title="Unfollower Snapshots" desc="Save follower lists to track unfollowers over time." badge="Snapshot"/>
+            <FeatureCard delay={180} icon={<IcClock size={19}/>}    title="Historical Snapshots" desc="Save audience snapshots to track connection trends over time." badge="Snapshot"/>
             <FeatureCard delay={240} icon={<IcShield size={19}/>}   title="Privacy Audit" desc="Review 2FA status and synced phonebook contacts."/>
             <FeatureCard delay={300} icon={<IcLock size={19}/>}     title="100% Private" desc="Your data is parsed locally and never leaves your browser."/>
           </div>
@@ -320,7 +320,7 @@ export default function LandingPage({ onEnter, onDemo }) {
           <div className="lp-steps-grid">
             <StepCard num="01" title="Download Data" desc="Request your JSON data export from Instagram Settings." delay={0}/>
             <StepCard num="02" title="Upload ZIP" desc="Drop your downloaded ZIP file directly into Peeksta." delay={100}/>
-            <StepCard num="03" title="Explore Insights" desc="Browse chat history, voice notes, and non-followers." delay={200}/>
+            <StepCard num="03" title="Explore Insights" desc="Browse chat history, voice notes, and connection dynamics." delay={200}/>
           </div>
           <div className="lp-how-cta">
             <button className="lp-btn-hero-primary" onClick={() => onEnter()}><IcArrow size={16}/> Launch App</button>

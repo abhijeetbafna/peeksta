@@ -745,6 +745,29 @@ export default function InstagramChatModal({
   const [highlightedMsgId, setHighlightedMsgId] = useState(null);
   const [highlightedDateStr, setHighlightedDateStr] = useState(null);
 
+  const [theme, setTheme] = useState(() => localStorage.getItem('peeksta_theme') || 'dark');
+
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    localStorage.setItem('peeksta_theme', next);
+  };
+
+  const isDark = theme === 'dark';
+  const colors = {
+    bg: isDark ? '#0B0B0E' : '#F4F5F7',
+    chatBg: isDark ? '#000000' : '#FFFFFF',
+    sidebarBg: isDark ? '#0D0D0D' : '#FAFAFA',
+    headerBg: isDark ? '#141414' : '#FFFFFF',
+    cardBg: isDark ? '#141414' : '#FFFFFF',
+    cardInnerBg: isDark ? '#1F1F1F' : '#E5E7EB',
+    textPrimary: isDark ? '#FFFFFF' : '#111827',
+    textSecondary: isDark ? '#8E8E8E' : '#6B7280',
+    border: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)',
+    incomingBubbleBg: isDark ? '#262626' : '#E5E7EB',
+    incomingBubbleText: isDark ? '#F5F5F5' : '#111827'
+  };
+
   const handleJumpToMessage = (msgId, dateStr = null) => {
     setFilterType('all');
     setChatSearchQuery('');
@@ -1331,8 +1354,8 @@ export default function InstagramChatModal({
         display: 'flex',
         flexDirection: 'column',
         borderRadius: 0,
-        background: '#0B0B0E',
-        color: '#F5F5F5',
+        background: colors.bg,
+        color: colors.textPrimary,
         border: 'none',
         boxShadow: 'none',
         zIndex: 2500
@@ -1347,22 +1370,32 @@ export default function InstagramChatModal({
           style={{
             width: '340px',
             flexShrink: 0,
-            borderRight: '1px solid #1F1F24',
+            borderRight: `1px solid ${colors.border}`,
             display: 'flex',
             flexDirection: 'column',
-            background: '#121215'
+            background: colors.sidebarBg
           }}
         >
           {/* Sidebar Header */}
+          {/* Hidden File Input for uploading new DMs anytime */}
+          <input
+            id="insta-dm-modal-sidebar-file-input"
+            type="file"
+            accept=".zip,.json"
+            multiple
+            style={{ display: 'none' }}
+            onChange={(e) => processDMFile(e.target.files)}
+          />
+
+          {/* Sidebar Top Header Bar */}
           <div
             style={{
-              height: '60px',
-              padding: '0 16px',
-              borderBottom: '1px solid #1F1F24',
+              padding: '14px 16px',
+              borderBottom: `1px solid ${colors.border}`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              background: '#141417'
+              background: colors.headerBg
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -1381,36 +1414,58 @@ export default function InstagramChatModal({
                 <IconMessage size={18} />
               </div>
               <div>
-                <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#FFF', margin: 0, letterSpacing: '-0.2px' }}>
+                <h3 style={{ fontSize: '15px', fontWeight: 800, color: colors.textPrimary, margin: 0, letterSpacing: '-0.2px' }}>
                   Direct Messages
                 </h3>
-                <span style={{ fontSize: '11px', color: '#8E8E93' }}>
+                <span style={{ fontSize: '11px', color: colors.textSecondary }}>
                   {threads.length} conversations
                 </span>
               </div>
             </div>
 
-            {onClose && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <button
-                onClick={onClose}
+                onClick={() => document.getElementById('insta-dm-modal-sidebar-file-input')?.click()}
                 style={{
-                  background: '#1E1E22',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  color: '#E1306C',
-                  padding: '5px 12px',
-                  borderRadius: '20px',
-                  fontSize: '11.5px',
+                  background: 'linear-gradient(135deg, #E1306C, #833AB4)',
+                  border: 'none',
+                  color: '#FFF',
+                  padding: '5px 10px',
+                  borderRadius: '10px',
+                  fontSize: '11px',
                   fontWeight: 700,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '4px'
+                  gap: '4px',
+                  boxShadow: '0 2px 8px rgba(225, 48, 108, 0.35)',
+                  whiteSpace: 'nowrap'
                 }}
-                title="Return to main app dashboard"
+                title="Upload additional DMs from another account or ZIP file"
               >
-                ← Exit DMs
+                <IconUpload size={12} /> + Add Export
               </button>
-            )}
+
+              <button
+                onClick={toggleTheme}
+                style={{
+                  background: isDark ? '#262626' : '#E5E7EB',
+                  border: `1px solid ${colors.border}`,
+                  color: isDark ? '#F5F5F5' : '#111827',
+                  padding: '5px 9px',
+                  borderRadius: '10px',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '3px'
+                }}
+                title="Toggle Dark or Light Mode"
+              >
+                {isDark ? '☀️' : '🌙'}
+              </button>
+            </div>
           </div>
 
           {/* Thread Search Box */}
@@ -2141,8 +2196,8 @@ export default function InstagramChatModal({
                                 borderRadius: isOwner ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
                                 background: isOwner
                                   ? 'linear-gradient(135deg, #E1306C 0%, #833AB4 100%)'
-                                  : '#262626',
-                                color: '#FFFFFF',
+                                  : colors.incomingBubbleBg,
+                                color: isOwner ? '#FFFFFF' : colors.incomingBubbleText,
                                 fontSize: '13.5px',
                                 lineHeight: '1.45',
                                 wordBreak: 'break-word',
