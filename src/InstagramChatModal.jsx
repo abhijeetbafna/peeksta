@@ -357,7 +357,8 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
     doubleTextingMe = 0,
     doubleTextingPartner = 0,
     questionsMe = 0,
-    questionsPartner = 0
+    questionsPartner = 0,
+    badges = []
   } = analytics;
 
   const maxHourVal = Math.max(...hourlyCounts, 1);
@@ -440,6 +441,33 @@ export function ThreadAnalyticsView({ analytics, thread, onOpenRecap, onJumpToMe
           </div>
         </div>
       </div>
+
+      {/* Dynamic Personality & Vibe Badges Showcase */}
+      {badges.length > 0 && (
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          {badges.map((b, bIdx) => (
+            <div
+              key={bIdx}
+              style={{
+                background: palette.cardBg,
+                border: `1px solid ${palette.border}`,
+                borderRadius: '12px',
+                padding: '10px 14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+              }}
+            >
+              <span style={{ fontSize: '20px' }}>{b.icon}</span>
+              <div>
+                <div style={{ fontSize: '12.5px', fontWeight: 700, color: palette.textPrimary }}>{b.title}</div>
+                <div style={{ fontSize: '10.5px', color: palette.textSecondary }}>{b.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Timeline Milestones & Jump Actions Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>

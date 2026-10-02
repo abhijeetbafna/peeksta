@@ -431,6 +431,9 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
   let doubleTextingMe = 0, doubleTextingPartner = 0;
   let questionsMe = 0, questionsPartner = 0;
 
+  const starterMapMe = new Map();
+  const starterMapPartner = new Map();
+
   for (let i = 0; i < messages.length; i++) {
     const msg = messages[i];
     const isMe = msg.sender === meName || (currentUserName && msg.sender.toLowerCase() === currentUserName.toLowerCase());
@@ -461,9 +464,18 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
       }
 
       // Conversation initiation (gap > 4 hrs)
-      if (i === 0 || (messages[i - 1] && messages[i - 1].timestamp > 0 && (msg.timestamp - messages[i - 1].timestamp) > 4 * 3600 * 1000)) {
+      const isInitiation = i === 0 || (messages[i - 1] && messages[i - 1].timestamp > 0 && (msg.timestamp - messages[i - 1].timestamp) > 4 * 3600 * 1000);
+      if (isInitiation) {
         if (isMe) initiationsMe++;
         else initiationsPartner++;
+
+        if (msg.content && msg.content.trim()) {
+          const firstWord = msg.content.trim().split(/\s+/)[0].toLowerCase().replace(/[^\w]/g, '');
+          if (firstWord && firstWord.length >= 2 && !stopWords.has(firstWord)) {
+            const targetMap = isMe ? starterMapMe : starterMapPartner;
+            targetMap.set(firstWord, (targetMap.get(firstWord) || 0) + 1);
+          }
+        }
       }
     }
 
@@ -535,6 +547,38 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
   const topReactionsMe = Array.from(reactionsMeMap.entries()).sort((a, b) => b[1] - a[1]).slice(0, 4);
   const topReactionsPartner = Array.from(reactionsPartnerMap.entries()).sort((a, b) => b[1] - a[1]).slice(0, 4);
 
+  // Top Starter Words
+  const topStartersMe = Array.from(starterMapMe.entries()).sort((a, b) => b[1] - a[1]).slice(0, 3);
+  const topStartersPartner = Array.from(starterMapPartner.entries()).sort((a, b) => b[1] - a[1]).slice(0, 3);
+
+  // Dynamic Personality Badges
+  const badges = [];
+  const lateNightTotal = lateNightCountMe + lateNightCountPartner;
+  if (totalMsgs > 0 && (lateNightTotal / totalMsgs) > 0.12) {
+    badges.push({ icon: '🦉', title: 'Night Owls', desc: `${Math.round((lateNightTotal / totalMsgs) * 100)}% of messages sent past midnight` });
+  }
+  if (reelsMe + reelsPartner >= 5) {
+    badges.push({ icon: '🎬', title: 'Reels Lovers', desc: `${reelsMe + reelsPartner} shared reels in this chat` });
+  }
+  if (avgSecMe > 0 && avgSecMe < 300) {
+    badges.push({ icon: '⚡', title: `${meName} Speed Replier`, desc: 'Replies in under 5 minutes on average' });
+  }
+  if (avgSecPartner > 0 && avgSecPartner < 300) {
+    badges.push({ icon: '⚡', title: `${partnerName} Speed Replier`, desc: 'Replies in under 5 minutes on average' });
+  }
+  if (maxStreak >= 4) {
+    badges.push({ icon: '🔥', title: `${maxStreak}-Day Streak`, desc: 'Unbroken consecutive chat streak record' });
+  }
+  if (audioMe + audioPartner >= 3) {
+    badges.push({ icon: '🎙️', title: 'Voice Note Fans', desc: `${audioMe + audioPartner} voice notes exchanged` });
+  }
+  if (avgWordsMe > 12 || avgWordsPartner > 12) {
+    badges.push({ icon: '📜', title: 'Deep Storytellers', desc: 'Sends rich & expressive messages' });
+  }
+  if (badges.length === 0) {
+    badges.push({ icon: '✨', title: 'Vibrant Dynamic Duo', desc: 'Active & engaged chat partners' });
+  }
+
   // Averages
   const avgCharsMe = textMsgsMe > 0 ? Math.round(totalCharsMe / textMsgsMe) : 0;
   const avgWordsMe = textMsgsMe > 0 ? Math.round((totalWordsMe / textMsgsMe) * 10) / 10 : 0;
@@ -581,7 +625,7 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
     avgWordsPartner,
     lateNightCountMe,
     lateNightCountPartner,
-    lateNightTotal: lateNightCountMe + lateNightCountPartner,
+    lateNightTotal,
     initiationsMe,
     initiationsPartner,
     reelsMe,
@@ -597,7 +641,10 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
     doubleTextingMe,
     doubleTextingPartner,
     questionsMe,
-    questionsPartner
+    questionsPartner,
+    topStartersMe,
+    topStartersPartner,
+    badges
   };
 }
 
