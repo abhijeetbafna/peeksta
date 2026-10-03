@@ -5,7 +5,7 @@ import TimeMachineModal from './TimeMachineModal';
 import EngagementHubModal from './EngagementHubModal';
 import SecurityScorecardModal from './SecurityScorecardModal';
 import FastReviewQueueModal from './FastReviewQueueModal';
-import { getWhitelist, saveWhitelist, saveSnapshot } from './snapshotStorage';
+import { getWhitelist, saveWhitelist, saveSnapshot, clearAllStoredData } from './snapshotStorage';
 import { parseMessageThread, parseLikedPosts, computeSecurityHealth, mergeThreadsList } from './analyticsParser';
 import InstagramChatModal from './InstagramChatModal';
 import PublicProfileInspectorModal from './PublicProfileInspectorModal';
@@ -1384,7 +1384,7 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
             <span>AI Network Engine</span>
           </div>
           <p className="card-pro-desc">
-            100% Client-Side Privacy. Your data never leaves your browser.
+            🔒 Everything is processed on your device. Nothing is uploaded to any server.
           </p>
           {hasData ? (
             <button
@@ -1415,6 +1415,35 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
               Load Demo Data
             </button>
           )}
+          <button
+            onClick={async () => {
+              if (!confirm("Delete ALL data Peeksta has stored in this browser?\n\nThis clears the loaded archive, saved Time-Machine snapshots and your VIP whitelist. This cannot be undone.")) return;
+              await clearAllStoredData();
+              setDataSets({});
+              setSlotFollowers(null);
+              setSlotFollowing(null);
+              setDmThreads([]);
+              setLikedAccounts([]);
+              setZipFileRef(null);
+              setWhitelist(new Set());
+              setActiveTab('upload');
+              showToast("All local data deleted.");
+            }}
+            style={{
+              width: '100%',
+              marginTop: '8px',
+              background: 'none',
+              border: 'none',
+              color: 'var(--bento-text-muted)',
+              fontSize: '11px',
+              fontWeight: 600,
+              textDecoration: 'underline',
+              cursor: 'pointer',
+              fontFamily: 'inherit'
+            }}
+          >
+            Clear all my data
+          </button>
         </div>
       </aside>
 

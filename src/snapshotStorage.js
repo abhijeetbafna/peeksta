@@ -199,3 +199,24 @@ export function saveWhitelist(whitelistSet) {
     console.warn('Could not save whitelist to localStorage:', e);
   }
 }
+
+// ---------------- WIPE EVERYTHING ----------------
+
+// Removes every piece of data this app keeps in the browser:
+// saved Time-Machine snapshots (IndexedDB), VIP whitelist and theme (localStorage).
+export function clearAllStoredData() {
+  try {
+    localStorage.removeItem(WHITELIST_KEY);
+    localStorage.removeItem('peeksta_theme');
+  } catch (e) {
+    console.warn('Could not clear localStorage:', e);
+  }
+
+  return new Promise((resolve) => {
+    if (!window.indexedDB) return resolve(true);
+    const req = indexedDB.deleteDatabase(DB_NAME);
+    req.onsuccess = () => resolve(true);
+    req.onerror = () => resolve(false);
+    req.onblocked = () => resolve(false);
+  });
+}

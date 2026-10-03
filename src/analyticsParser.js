@@ -434,6 +434,14 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
   const starterMapMe = new Map();
   const starterMapPartner = new Map();
 
+  const monthlyMap = new Map();
+  const onThisDay = [];
+  const today = new Date();
+  const todayMonth = today.getMonth();
+  const todayDate = today.getDate();
+  const todayYear = today.getFullYear();
+  const laughterRegex = /\b(a?ha(ha)+h?|lol+|lmao+|lmfao|rofl|hehe+|hihi+)\b|😂|🤣|😆|😹|💀|😭/iu;
+
   for (let i = 0; i < messages.length; i++) {
     const msg = messages[i];
     const isMe = msg && msg.sender ? (msg.sender === meName || (currentUserName && msg.sender.toLowerCase() === currentUserName.toLowerCase())) : false;
@@ -455,6 +463,36 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
       } else {
         const item = dateCountsMap.get(dateKey);
         item.count++;
+      }
+
+      // Messages per month (timeline)
+      const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      if (!monthlyMap.has(monthKey)) {
+        monthlyMap.set(monthKey, {
+          key: monthKey,
+          label: d.toLocaleDateString(undefined, { month: 'short', year: 'numeric' }),
+          count: 1,
+          firstMsgId: msg.id
+        });
+      } else {
+        monthlyMap.get(monthKey).count++;
+      }
+
+      // On This Day (same calendar day in a previous year)
+      if (
+        d.getMonth() === todayMonth &&
+        d.getDate() === todayDate &&
+        d.getFullYear() < todayYear &&
+        msg.content && msg.content.trim()
+      ) {
+        onThisDay.push({
+          id: msg.id,
+          sender: msg.sender || '',
+          content: msg.content,
+          formattedDate,
+          formattedTime: msg.formattedTime || '',
+          yearsAgo: todayYear - d.getFullYear()
+        });
       }
 
       // Late night chatter (12 AM - 6 AM)
@@ -490,8 +528,8 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
         else questionsPartner++;
       }
 
-      // Check laughter / high energy
-      const isLaughter = /haha|hahaha|lol|lmao|rofl|hehe/i.test(lower) || (msg.content.includes('!') && charLen > 10);
+      // Laughter: haha/lol/lmao-style words and laughing emojis
+      const isLaughter = laughterRegex.test(lower);
       if (isLaughter) {
         if (isMe) laughterMe++; else laughterPartner++;
       }
@@ -551,6 +589,17 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
   const topStartersMe = Array.from(starterMapMe.entries()).sort((a, b) => b[1] - a[1]).slice(0, 3);
   const topStartersPartner = Array.from(starterMapPartner.entries()).sort((a, b) => b[1] - a[1]).slice(0, 3);
 
+  // Averages (must be computed before badges, which read them)
+  const avgCharsMe = textMsgsMe > 0 ? Math.round(totalCharsMe / textMsgsMe) : 0;
+  const avgWordsMe = textMsgsMe > 0 ? Math.round((totalWordsMe / textMsgsMe) * 10) / 10 : 0;
+
+  const avgCharsPartner = textMsgsPartner > 0 ? Math.round(totalCharsPartner / textMsgsPartner) : 0;
+  const avgWordsPartner = textMsgsPartner > 0 ? Math.round((totalWordsPartner / textMsgsPartner) * 10) / 10 : 0;
+
+  // Timeline (chronological) and On This Day (most recent years first)
+  const monthlyCounts = Array.from(monthlyMap.values()).sort((a, b) => a.key.localeCompare(b.key));
+  onThisDay.sort((a, b) => a.yearsAgo - b.yearsAgo);
+
   // Dynamic Personality Badges
   const badges = [];
   const lateNightTotal = lateNightCountMe + lateNightCountPartner;
@@ -578,13 +627,6 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
   if (badges.length === 0) {
     badges.push({ icon: '✨', title: 'Vibrant Dynamic Duo', desc: 'Active & engaged chat partners' });
   }
-
-  // Averages
-  const avgCharsMe = textMsgsMe > 0 ? Math.round(totalCharsMe / textMsgsMe) : 0;
-  const avgWordsMe = textMsgsMe > 0 ? Math.round((totalWordsMe / textMsgsMe) * 10) / 10 : 0;
-
-  const avgCharsPartner = textMsgsPartner > 0 ? Math.round(totalCharsPartner / textMsgsPartner) : 0;
-  const avgWordsPartner = textMsgsPartner > 0 ? Math.round((totalWordsPartner / textMsgsPartner) * 10) / 10 : 0;
 
   return {
     totalMsgs,
@@ -644,7 +686,9 @@ export function computeThreadAnalytics(thread, currentUserName = '') {
     questionsPartner,
     topStartersMe,
     topStartersPartner,
-    badges
+    badges,
+    monthlyCounts,
+    onThisDay: onThisDay.slice(0, 8)
   };
 }
 

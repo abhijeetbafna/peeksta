@@ -1,0 +1,52 @@
+/* Desktop: back button is only needed on phones */
+.insta-mobile-back {
+  display: none !important;
+}
+
+.insta-global-result:hover {
+  background: rgba(225, 48, 108, 0.1);
+}
+
+/* Phones & small tablets: show either the chat list or the open chat, not both */
+@media (max-width: 768px) {
+  .insta-chat-sidebar {
+    width: 100% !important;
+    border-right: none !important;
+  }
+
+  .insta-chat-main {
+    display: none !important;
+  }
+
+  .insta-chat-modal-workspace.mobile-chat-open .insta-chat-sidebar {
+    display: none !important;
+  }
+
+  .insta-chat-modal-workspace.mobile-chat-open .insta-chat-main {
+    display: flex !important;
+    width: 100%;
+  }
+
+  .insta-mobile-back {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .insta-chat-header-row {
+    flex-wrap: wrap !important;
+    padding: 10px 12px !important;
+    gap: 10px !important;
+  }
+
+  .insta-chat-header-actions {
+    flex-shrink: 1 !important;
+    flex-wrap: wrap !important;
+    width: 100%;
+    gap: 6px !important;
+  }
+
+  .insta-chat-canvas {
+    padding: 14px 10px !important;
+  }
+}
