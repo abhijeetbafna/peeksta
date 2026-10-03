@@ -10,17 +10,23 @@ Peeksta is a privacy-first, client-side web application designed for analyzing I
 
 ### 💬 DM Studio & Conversation Viewer
 - 📝 **Edited Message History**: View full unredacted edit logs for edited messages (compare draft vs final edited text).
-- 🎬 **Shared Reels Gallery**: Dedicated tab to explore all shared Instagram Reels and video posts across chat history.
+- 🎬 **Shared Reels Gallery & Media Vault**: Dedicated tab to explore all shared Instagram Reels, videos, and photos across chat history.
 - 🖼️ **Real-Time Profile Picture Fetcher**: Dynamically fetches participant avatars with instant fallbacks.
 - 🎵 **Voice Notes & Media Player**: Play audio notes, view photo galleries, and search keywords within any DM thread.
 - 🚀 **Interactive Message Jumping**: Instantly scroll to the 1st conversation date, record peak day, or latest message with glowing message highlights.
+- 🔍 **Cross-Thread Search**: Search for matching message snippets across all your conversations.
+- 📱 **Mobile-Optimized Single-Pane UI**: Native app-like navigation between chat list and thread views on mobile devices.
+- 💾 **Standalone Chat Archiver**: Download your chats in HTML, TXT, or JSON format.
 
 ### 📊 Deep Conversation Insights & Analytics
-- 🗓️ **Timeline Milestones**: 1st conversation start date, peak activity record day (most messages in 24h), and last active timestamp.
+- 🗓️ **Timeline Milestones & On This Day**: 1st conversation start date, peak activity record day, and flashback cards highlighting milestone messages sent on this calendar day in past years.
+- 📈 **Relationship Timeline**: Visual monthly histogram tracking messaging progression over time.
 - 📝 **Average Text Length Dynamics**: Measures average word and character count per message per participant (showing who writes longer texts).
+- 😆 **Laughing-Emoji & Slang Detection**: Built-in detection for 😂, 🤣, 💀, lol, lmao, and more, paired with conversation starter phrase breakdowns.
+- ⚖️ **Compare Two Chats Modal**: Side-by-side comparative analysis of message volume, double texting, curiosity score, humor meter, and streaks across any two conversations.
 - 🌙 **Late Night Chatter Index**: Tracks midnight to 6 AM message volume and conversation starter frequencies.
-- ⚡ **Reply Speed Latency**: Measures response latency between alternate senders.
-- 📱 **9:16 Story Recap Card Generator**: Create customizable, shareable 9:16 Instagram Story cards (*Neon Sunset*, *Obsidian Glass*, *Cyber Emerald*, *Minimal Dusk*) and download high-res PNGs.
+- ⚡ **Reply Speed Latency & Double Texting**: Measures response latency and instances of double-texting.
+- 📱 **9:16 Story Recap Card Generator**: Create customizable, shareable 9:16 Instagram Story cards and download high-res PNG summaries.
 
 ### 👥 Audience & Reciprocity Tracking
 - 🔄 **Audience Reciprocity & Allocation**: Instantly discover non-followers (accounts you follow who do not follow back), mutual friends, and admirer accounts with visual bento distribution charts.
@@ -75,6 +81,8 @@ Open `http://localhost:5173` in your browser.
 Peeksta operates with a strict zero-telemetry architecture:
 - **Client-Side Only**: 100% of data processing occurs inside your local JavaScript engine.
 - **No Remote Servers**: Your followers, following list, DM metadata, and contact logs are never sent to any server.
+- **Clear All My Data**: A one-click purge button wipes all IndexedDB databases and localStorage, leaving zero footprint.
+- **PWA Offline Support**: Installable as a Progressive Web App (PWA) with full offline functionality.
 
 ---
 

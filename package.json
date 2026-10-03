@@ -1,5 +1,6 @@
 {
   "name": "insta-app",
+  "description": "Peeksta — Next-generation client-side Instagram audience analytics, reciprocity tracking, DM insights, and network intelligence.",
   "private": true,
   "version": "0.0.0",
   "type": "module",
