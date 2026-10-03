@@ -8,6 +8,7 @@ import FastReviewQueueModal from './FastReviewQueueModal';
 import { getWhitelist, saveWhitelist, saveSnapshot } from './snapshotStorage';
 import { parseMessageThread, parseLikedPosts, computeSecurityHealth, mergeThreadsList } from './analyticsParser';
 import InstagramChatModal from './InstagramChatModal';
+import PublicProfileInspectorModal from './PublicProfileInspectorModal';
 import {
   IconDashboard,
   IconUserMinus,
@@ -432,6 +433,8 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
   const [showEngagementHub, setShowEngagementHub] = useState(false);
   const [showSecurityScorecard, setShowSecurityScorecard] = useState(false);
   const [showReviewQueue, setShowReviewQueue] = useState(false);
+  const [showInspectorModal, setShowInspectorModal] = useState(false);
+  const [inspectorInitialHandle, setInspectorInitialHandle] = useState('');
   const [dmThreads, setDmThreads] = useState([]);
   const [likedAccounts, setLikedAccounts] = useState([]);
   const [whitelist, setWhitelist] = useState(() => getWhitelist());
@@ -1350,6 +1353,20 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
           </button>
 
           <button
+            className="nav-item-btn"
+            onClick={() => {
+              setInspectorInitialHandle('');
+              setShowInspectorModal(true);
+              setSidebarOpen(false);
+            }}
+          >
+            <div className="nav-item-content">
+              <span className="nav-item-icon"><IconSearch size={15} /></span>
+              <span>Profile Inspector 🔍</span>
+            </div>
+          </button>
+
+          <button
             className={`nav-item-btn ${activeTab === 'upload' ? 'active' : ''}`}
             onClick={() => { setActiveTab('upload'); setSidebarOpen(false); }}
           >
@@ -2250,6 +2267,21 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
         whitelist={whitelist}
         toggleWhitelist={toggleWhitelist}
         showToast={showToast}
+      />
+
+      <PublicProfileInspectorModal
+        isOpen={showInspectorModal}
+        onClose={() => setShowInspectorModal(false)}
+        initialUsername={inspectorInitialHandle}
+        threads={dmThreads}
+        followingList={insights.following}
+        followersList={insights.followers}
+        closeFriendsList={insights.extraFiles?.close_friends?.items || []}
+        blockedList={insights.extraFiles?.blocked_profiles?.items || insights.extraFiles?.blocked_accounts?.items || []}
+        onSelectThread={(threadKey) => {
+          setSelectedChatThreadKey(threadKey);
+          setShowChatModal(true);
+        }}
       />
 
       {/* Toast Notification */}

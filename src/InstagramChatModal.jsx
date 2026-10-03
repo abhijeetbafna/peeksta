@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import JSZip from 'jszip';
 import { parseMessageThread, mergeThreadsList, isReelMessage, computeThreadAnalytics } from './analyticsParser';
 import ChatRecapModal from './ChatRecapModal';
+import PublicProfileInspectorModal from './PublicProfileInspectorModal';
 import {
   IconMessage,
   IconClose,
@@ -1049,6 +1050,8 @@ export default function InstagramChatModal({
   const [mySenderName, setMySenderName] = useState(null); // User-selected "Me" identity
   const [expandedEditsMap, setExpandedEditsMap] = useState({}); // Track expanded edit history per msg
   const [showRecapModal, setShowRecapModal] = useState(false);
+  const [showProfileInspector, setShowProfileInspector] = useState(false);
+  const [inspectorHandle, setInspectorHandle] = useState('');
   const [highlightedMsgId, setHighlightedMsgId] = useState(null);
   const [highlightedDateStr, setHighlightedDateStr] = useState(null);
 
@@ -2064,19 +2067,43 @@ export default function InstagramChatModal({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
                   <UserAvatar username={activeThread.title} title={activeThread.title} size={40} isDark={isDark} />
                   <div style={{ minWidth: 0 }}>
-                    <h4
-                      style={{
-                        fontSize: '15px',
-                        fontWeight: 700,
-                        color: colors.textPrimary,
-                        margin: 0,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
-                      }}
-                    >
-                      {activeThread.title}
-                    </h4>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <h4
+                        style={{
+                          fontSize: '15px',
+                          fontWeight: 700,
+                          color: colors.textPrimary,
+                          margin: 0,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        {activeThread.title}
+                      </h4>
+                      <button
+                        onClick={() => {
+                          setInspectorHandle(activeThread.title);
+                          setShowProfileInspector(true);
+                        }}
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(225, 48, 108, 0.2), rgba(131, 58, 180, 0.2))',
+                          border: `1px solid rgba(225, 48, 108, 0.4)`,
+                          color: '#E1306C',
+                          padding: '2px 8px',
+                          borderRadius: '8px',
+                          fontSize: '10.5px',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '3px'
+                        }}
+                        title="Inspect Instagram profile, reels & stories links"
+                      >
+                        🔍 Inspect Profile
+                      </button>
+                    </div>
                     <div
                       style={{
                         fontSize: '11px',
@@ -3164,6 +3191,15 @@ export default function InstagramChatModal({
         onClose={() => setShowRecapModal(false)}
         activeThread={activeThread}
         analytics={computeThreadAnalytics(activeThread, mySenderName)}
+      />
+
+      {/* Instagram Public Profile Inspector Modal */}
+      <PublicProfileInspectorModal
+        isOpen={showProfileInspector}
+        onClose={() => setShowProfileInspector(false)}
+        initialUsername={inspectorHandle || activeThread?.title || ''}
+        threads={threads}
+        isDark={isDark}
       />
     </div>
   );
