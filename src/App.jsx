@@ -418,7 +418,7 @@ function UserAvatar({ username, name }) {
 function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
   const [dataSets, setDataSets] = useState({});
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview'); 
+  const [activeTab, setActiveTab] = useState(initialDemo ? 'overview' : 'upload'); 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedRawFile, setSelectedRawFile] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -756,7 +756,7 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
         setDmThreads((prev) => mergeThreadsList([...prev, ...mergedDMs]));
         setZipFileRef(loadedZip);
         showToast(`Loaded ${mergedDMs.length} DM conversations!`);
-        setShowChatModal(true);
+        setActiveTab('dms');
       }
       if (extractedLikes.length > 0) {
         setLikedAccounts(extractedLikes);
@@ -765,6 +765,9 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
       if (Object.keys(newSets).length > 0) {
         setDataSets((prev) => ({ ...prev, ...newSets }));
         showToast(`Loaded ${Object.keys(newSets).length} connection lists!`);
+        if (extractedDMs.length === 0) {
+          setActiveTab('overview');
+        }
       }
 
       if (Object.keys(newSets).length === 0 && extractedDMs.length === 0 && extractedLikes.length === 0) {
@@ -783,6 +786,7 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
     setLoading(true);
+    const newSets = {};
     const extractedDMs = [];
     for (const file of files) {
       if (file.name.toLowerCase().endsWith('.json')) {
@@ -810,12 +814,15 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
     if (extractedDMs.length > 0) {
       setDmThreads((prev) => mergeThreadsList([...prev, ...extractedDMs]));
       showToast(`Loaded ${extractedDMs.length} DM conversations!`);
-      setShowChatModal(true);
+      setActiveTab('dms');
     }
 
     if (Object.keys(newSets).length > 0) {
       setDataSets((prev) => ({ ...prev, ...newSets }));
       showToast(`Loaded ${Object.keys(newSets).length} connection files!`);
+      if (extractedDMs.length === 0) {
+        setActiveTab('overview');
+      }
     }
 
     setLoading(false);
@@ -1593,7 +1600,7 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
               showToast(`Loaded ${newDMs.length} DM conversations!`);
             }}
           />
-        ) : activeTab === 'upload' || (!hasData && activeTab !== 'overview') ? (
+        ) : activeTab === 'upload' || (!hasData && dmThreads.length === 0) ? (
           /* VIEW: UPLOAD & ONBOARDING */
           <div className="bento-card onboarding-bento-card" style={{ maxWidth: '960px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
@@ -1681,13 +1688,37 @@ function App({ initialDemo = false, preloadedFile = null, onBackToLanding }) {
                 </p>
                 <button
                   className="bento-btn bento-btn-primary"
-                  style={{ width: '100%', background: 'linear-gradient(135deg, #C13584, #833AB4)' }}
+                  style={{ width: '100%', background: 'linear-gradient(135deg, #C13584, #833AB4)', marginBottom: '8px' }}
+                  onClick={() => document.getElementById('dm-upload-input-card')?.click()}
+                >
+                  <IconUpload size={14} />
+                  Select Messages / DM ZIP
+                </button>
+                <input
+                  id="dm-upload-input-card"
+                  type="file"
+                  accept=".zip,.json"
+                  multiple
+                  style={{ display: 'none' }}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file?.name.toLowerCase().endsWith('.zip')) {
+                      await handleZipUpload(e);
+                    } else {
+                      await handleMultiUpload(e);
+                    }
+                    setActiveTab('dms');
+                  }}
+                />
+                <button
+                  className="bento-btn bento-btn-secondary"
+                  style={{ width: '100%' }}
                   onClick={() => {
                     setActiveTab('dms');
                   }}
                 >
                   <IconMessage size={14} />
-                  Open DM Upload & Viewer
+                  Open DM Viewer
                 </button>
               </div>
             </div>
